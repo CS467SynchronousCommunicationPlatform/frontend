@@ -25,7 +25,7 @@ const ChatPage: React.FC = () => {
           <div className={styles.chatWindow}>
             <div className={styles.message}>
               <span className={styles.user}>User1</span> <span className={styles.timestamp}>10/17/2024 11:15 PM</span>
-              <p>What's up guys</p>
+              <p>What&apos;s up guys</p>
             </div>
             <div className={styles.message}>
               <span className={styles.user}>User2</span> <span className={styles.timestamp}>10/17/2024 11:20 PM</span>
