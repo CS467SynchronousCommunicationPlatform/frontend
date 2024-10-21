@@ -1,0 +1,112 @@
+.container {
+    display: flex;
+    height: 100vh;
+    background-color: #2f3136;
+    color: #fff;
+}
+
+.sidebarLeft {
+    width: 200px;
+    background-color: #202225;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+}
+
+.sidebarLeft h3 {
+    margin-bottom: 20px;
+    color: #b9bbbe;
+}
+
+.sidebarLeft ul {
+    list-style: none;
+    padding: 0;
+}
+
+.sidebarLeft li {
+    margin-bottom: 10px;
+    cursor: pointer;
+}
+
+.activeChannel {
+    color: white;
+}
+
+.logoutButton {
+    margin-top: auto;
+    background-color: #7289da;
+    color: white;
+    border: none;
+    padding: 10px;
+    cursor: pointer;
+}
+
+.chatSection {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+.chatHeader {
+    padding: 10px;
+    background-color: #36393f;
+    border-bottom: 1px solid #202225;
+}
+
+.chatWindow {
+    flex: 1;
+    padding: 20px;
+    overflow-y: auto;
+}
+
+.message {
+    margin-bottom: 20px;
+}
+
+.user {
+    font-weight: bold;
+    color: #b9bbbe;
+}
+
+.timestamp {
+    font-size: 12px;
+    color: #72767d;
+    margin-left: 10px;
+}
+
+.messageInput {
+    padding: 10px;
+    background-color: #40444b;
+    border: none;
+    color: white;
+}
+
+.sidebarRight {
+    width: 200px;
+    background-color: #202225;
+    padding: 20px;
+}
+
+.sidebarRight h3 {
+    margin-bottom: 20px;
+    color: #b9bbbe;
+}
+
+.userStatus {
+    margin-bottom: 20px;
+}
+
+.userStatus p {
+    font-weight: bold;
+    color: #b9bbbe;
+}
+
+.userStatus ul {
+    list-style: none;
+    padding: 0;
+}
+
+.userStatus li {
+    margin-bottom: 10px;
+    color: white;
+}
