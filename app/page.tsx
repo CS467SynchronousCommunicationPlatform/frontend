@@ -1,6 +1,7 @@
 // page.tsx
 import React from 'react';
 import styles from './ChatPage.module.css';
+import { signout } from '@/app/login/actions';
 
 const ChatPage: React.FC = () => {
   return (
@@ -14,7 +15,7 @@ const ChatPage: React.FC = () => {
             <li>User4</li>
             <li>User7</li>
           </ul>
-          <button className={styles.logoutButton}>Logout</button>
+          <button onClick={signout} className={styles.logoutButton}>Logout</button>
         </div>
 
         {/* Main Chat Section */}
