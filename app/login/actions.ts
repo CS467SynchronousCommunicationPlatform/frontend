@@ -14,7 +14,7 @@ import { createClient } from '@/utils/supabase/server'
 
 export async function login() {
   const supabase = await createClient()
-  const origin = "https://frontend-self-tau.vercel.app"
+  const origin = process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:3000"
   const { data, error } = await supabase.auth.signInWithOAuth({
     provider: 'google',
     options: {
