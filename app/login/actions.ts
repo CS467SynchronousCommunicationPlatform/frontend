@@ -12,54 +12,32 @@ import { redirect } from 'next/navigation'
 
 import { createClient } from '@/utils/supabase/server'
 
-export async function login(formData: FormData) {
-  const supabase = createClient()
-
-  // type-casting here for convenience
-  // in practice, you should validate your inputs
-  const data = {
-    email: formData.get('email') as string,
-    password: formData.get('password') as string,
-  }
-
-  const { error } = await supabase.auth.signInWithPassword(data)
+export async function login() {
+  const supabase = await createClient()
+  const origin = process.env.NODE_ENV === 'development' ? "http://localhost:3000" : "https://frontend-self-tau.vercel.app"
+  const { data, error } = await supabase.auth.signInWithOAuth({
+    provider: 'google',
+    options: {
+      redirectTo: `${origin}/auth/callback`,
+    },
+  })
 
   if (error) {
     redirect('/error')
   }
 
   revalidatePath('/', 'layout')
-  redirect('/')
-}
-
-export async function signup(formData: FormData) {
-  const supabase = createClient()
-
-  // type-casting here for convenience
-  // in practice, you should validate your inputs
-  const data = {
-    email: formData.get('email') as string,
-    password: formData.get('password') as string,
-  }
-
-  const { error } = await supabase.auth.signUp(data)
-
-  if (error) {
-    redirect('/error')
-  }
-
-  revalidatePath('/', 'layout')
-  redirect('/')
+  redirect(data.url!)
 }
 
 export async function signout() {
-    const supabase = createClient()
-    const { error } = await supabase.auth.signOut()
+  const supabase = await createClient()
+  const { error } = await supabase.auth.signOut()
 
-    if (error) {
-        redirect('/error')
-    }
+  if (error) {
+    redirect('/error')
+  }
 
-    revalidatePath('/', 'layout')
-    redirect('/')
+  revalidatePath('/', 'layout')
+  redirect('/')
 }
