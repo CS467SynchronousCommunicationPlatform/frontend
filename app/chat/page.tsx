@@ -1,8 +1,21 @@
 // page.tsx
+'use client'
+
 import React from 'react';
+import { createClient } from "@supabase/supabase-js"
+import { useRouter } from 'next/navigation'
 import styles from '../ChatPage.module.css';
 
 export default function ChatPage() {
+  const router = useRouter()
+
+  const signOut = async () => {
+    const supabase = await createClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!)
+    const { error } = await supabase.auth.signOut()
+    // TODO: handle error
+    router.push('/')
+  }
+  
   return (
       <div className={styles.container}>
         {/* Left Sidebar */}
@@ -14,7 +27,7 @@ export default function ChatPage() {
             <li>User4</li>
             <li>User7</li>
           </ul>
-          <button className={styles.logoutButton}>Logout</button>
+          <button type="button" onClick={signOut} className={styles.logoutButton}>Logout</button>
         </div>
 
         {/* Main Chat Section */}
