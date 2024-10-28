@@ -12,6 +12,7 @@ export default function ChatPage() {
   const signOut = async () => {
     const supabase = await createClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!)
     const { error } = await supabase.auth.signOut()
+    console.log(error)
     // TODO: handle error
     router.push('/')
   }
