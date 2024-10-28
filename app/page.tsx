@@ -1,6 +1,4 @@
 
-'use client'
-=======
 // page.tsx
 import React from 'react';
 import styles from './ChatPage.module.css';
