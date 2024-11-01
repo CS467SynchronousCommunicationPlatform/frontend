@@ -1,10 +1,8 @@
 /**
  * /app/login/actions.ts
- * Implements user login, logout and signup
+ * Implements user Google OAuth
  * Source: https://supabase.com/docs/guides/auth/server-side/nextjs?queryGroups=router&router=app
  */
-
-
 'use server'
 
 import { revalidatePath } from 'next/cache'
@@ -36,12 +34,13 @@ export async function login() {
     },
   })
 
+  if (data.url) {
+    redirect(data.url)
+  }
+
   if (error) {
     redirect('/error')
   }
-
-  revalidatePath('/', 'layout')
-  redirect(data.url!)
 }
 
 export async function signout() {

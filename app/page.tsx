@@ -2,8 +2,19 @@
 import React from 'react';
 import styles from './ChatPage.module.css';
 import { signout } from '@/app/login/actions';
+import { createClient } from '@/utils/supabase/server'
+import { redirect } from 'next/navigation'
 
-const ChatPage: React.FC = () => {
+const ChatPage: React.FC = async () => {
+  // Check if user is authenticatee
+  const supabase = await createClient()
+  const {
+      data: { user },
+  } = await supabase.auth.getUser()
+
+  if (!user) {
+      return redirect('/login')
+  }
   return (
       <div className={styles.container}>
         {/* Left Sidebar */}
