@@ -19,17 +19,18 @@ export async function WebsocketChat() {
         redirect('/login')
     }
     const [messageHistory, setMessageHistory] = useState<MessageEvent<any>[]>([]);
-
-    // set up websocket
+    // Set up websocket hook
     const {
         sendMessage,
         lastMessage,
         readyState,
       } = useWebSocket(socketUrl, {
         onOpen: () => console.log('opened'),
+        // Attempts to reconnect if socket unexpectedly closed
         shouldReconnect: () => true,
       })
     
+      // if there is a last message, add it to messageHistory
       useEffect(() => {
         if (lastMessage !== null) {
           setMessageHistory((prev) => prev.concat(lastMessage));
