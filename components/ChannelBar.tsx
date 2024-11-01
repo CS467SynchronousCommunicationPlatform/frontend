@@ -1,5 +1,5 @@
 import React from 'react';
-import styles from './ChatPage.module.css';
+import styles from '../app/ChatPage.module.css'
 import { signout } from '@/app/login/actions';
 
 const ChannelBar: React.FC = () => (
