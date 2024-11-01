@@ -1,7 +1,7 @@
 // page.tsx
 import React from 'react';
 import styles from './ChatPage.module.css';
-import { signout } from '@/app/login/actions';
+import ChannelBar from "@/components/ChannelBar";
 import { createClient } from '@/utils/supabase/server'
 import { redirect } from 'next/navigation'
 
@@ -18,16 +18,7 @@ const ChatPage: React.FC = async () => {
   return (
       <div className={styles.container}>
         {/* Left Sidebar */}
-        <div className={styles.sidebarLeft}>
-          <h3>Channels</h3>
-          <ul>
-            <li className={styles.activeChannel}>general</li>
-            <li>User3</li>
-            <li>User4</li>
-            <li>User7</li>
-          </ul>
-          <button onClick={signout} className={styles.logoutButton}>Logout</button>
-        </div>
+        <ChannelBar />
 
         {/* Main Chat Section */}
         <div className={styles.chatSection}>
