@@ -6,7 +6,7 @@ import { createClient } from '@/utils/supabase/server'
 import { redirect } from 'next/navigation'
 
 const ChatPage: React.FC = async () => {
-  // Check if user is authenticatee
+  // Check if user is authenticated
   const supabase = await createClient()
   const {
       data: { user },
