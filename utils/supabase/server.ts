@@ -2,7 +2,7 @@
 // To access Supabase from Server Components, Server Actions, Route Handlers
 // Source: https://supabase.com/docs/guides/auth/server-side/nextjs?queryGroups=router&router=app
 
-import { createServerClient, type CookieOptions } from '@supabase/ssr'
+import { createServerClient } from '@supabase/ssr'
 import { cookies } from 'next/headers'
 
 export async function createClient() {

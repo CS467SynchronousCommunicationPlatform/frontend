@@ -1,22 +1,52 @@
-// page.tsx
-import React from 'react';
-import styles from './ChatPage.module.css';
-import { signout } from '@/app/login/actions';
+import { useState, useEffect } from 'react'
+import useWebSocket, { ReadyState } from 'react-use-websocket'
 import { createClient } from '@/utils/supabase/server'
 import { redirect } from 'next/navigation'
+import styles from '@/ChatPage.module.css';
 
-const ChatPage: React.FC = async () => {
-  // Check if user is authenticated
-  const supabase = await createClient()
-  const {
-      data: { user },
-  } = await supabase.auth.getUser()
 
-  if (!user) {
-      return redirect('/login')
-  }
-  return (
-      <div className={styles.container}>
+// URL to backend WebSocket server
+const socketUrl = ''
+
+export async function WebsocketChat() {
+    // Check if user is authenticated
+    const supabase = await createClient()
+    const {
+        data: { user },
+    } = await supabase.auth.getUser()
+
+    if (!user) {
+        redirect('/login')
+    }
+    const [messageHistory, setMessageHistory] = useState<MessageEvent<string>[]>([]);
+    // Set up websocket hook
+    const {
+        sendMessage,
+        lastMessage,
+        readyState,
+      } = useWebSocket(socketUrl, {
+        onOpen: () => sendMessage('connected'),
+        // Attempts to reconnect if socket unexpectedly closed
+        shouldReconnect: () => true,
+      })
+    
+      // if there is a last message, add it to messageHistory
+      useEffect(() => {
+        if (lastMessage !== null) {
+          setMessageHistory((prev) => prev.concat(lastMessage));
+        }
+      }, [lastMessage]);
+
+      const connectionStatus = {
+        [ReadyState.CONNECTING]: 'Connecting',
+        [ReadyState.OPEN]: 'Open',
+        [ReadyState.CLOSING]: 'Closing',
+        [ReadyState.CLOSED]: 'Closed',
+        [ReadyState.UNINSTANTIATED]: 'Uninstantiated',
+      }[readyState];
+
+      return (
+        <div className={styles.container}>
         {/* Left Sidebar */}
         <div className={styles.sidebarLeft}>
           <h3>Channels</h3>
@@ -26,7 +56,7 @@ const ChatPage: React.FC = async () => {
             <li>User4</li>
             <li>User7</li>
           </ul>
-          <button onClick={signout} className={styles.logoutButton}>Logout</button>
+          <button onClick={() => redirect('/auth/signout')} className={styles.logoutButton}>Logout</button>
         </div>
 
         {/* Main Chat Section */}
@@ -35,6 +65,13 @@ const ChatPage: React.FC = async () => {
             <h3>general</h3>
           </div>
           <div className={styles.chatWindow}>
+          <span>The WebSocket is currently {connectionStatus}</span>
+          {lastMessage ? <span>Last message: {lastMessage.data}</span> : null}
+          <ul>
+            {messageHistory.map((msg, idx) => (
+                <span key={idx}>{msg.data}</span>
+            ))}
+          </ul>
             <div className={styles.message}>
               <span className={styles.user}>User1</span> <span className={styles.timestamp}>10/17/2024 11:15 PM</span>
               <p>What&apos;s up guys</p>
@@ -86,7 +123,5 @@ const ChatPage: React.FC = async () => {
           </div>
         </div>
       </div>
-  );
-};
-
-export default ChatPage;
+      )
+}
