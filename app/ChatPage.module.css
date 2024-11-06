@@ -1,3 +1,5 @@
+/* ChatPage.module.css */
+
 .container {
     display: flex;
     height: 100vh;
@@ -79,6 +81,13 @@
     background-color: #40444b;
     border: none;
     color: white;
+    width: 100%;
+}
+
+.chatInputContainer {
+    padding: 10px;
+    background-color: #40444b;
+    border-top: 1px solid #202225;
 }
 
 .sidebarRight {
