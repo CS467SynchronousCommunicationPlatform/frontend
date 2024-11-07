@@ -1,6 +1,6 @@
 // page.tsx
 import React from 'react';
-import Chat from "@/components/socket";
+import Chat from "@/components/Chat";
 import { createClient } from '@/utils/supabase/server'
 import { redirect } from 'next/navigation'
 
