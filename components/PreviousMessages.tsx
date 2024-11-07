@@ -1,4 +1,6 @@
-// components/MessageList.tsx
+/**
+ * Represents the previous messages in a channel
+ */
 import React from 'react';
 import Message, { MessageProps } from '@/components/Message';
 import styles from '@/app/ChatPage.module.css';

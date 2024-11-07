@@ -1,7 +1,11 @@
-// components/MainChatSection.tsx
+/**
+ * Represents the input field where users can type and submit messages
+ */
 import React from 'react';
 import styles from '@/app/ChatPage.module.css';
 
+// Function handlers to pass in for submit and onchange events, as well as the 
+// default value
 export interface ChatInputProps {
     submitHandler: (event: React.FormEvent) => void
     onChangeHandler: (event: React.ChangeEvent<HTMLInputElement>) => void
