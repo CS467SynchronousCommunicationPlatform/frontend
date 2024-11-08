@@ -3,6 +3,7 @@
 import React, { useEffect, useState } from 'react';
 import styles from '../app/ChatPage.module.css';
 import { signout } from '@/app/login/actions';
+import { createClient } from '@/utils/supabase/client'
 
 // channel interface can add more metadata when needed
 interface Channel {
@@ -22,11 +23,10 @@ const ChannelBar: React.FC = () => {
     const [apiError, setApiError] = useState<boolean>(false);
 
     // Fetch channels the user belongs to
-    const fetchChannels = async (userId: string) => {
-
+    const fetchChannels = async () => {
         try {
-            // TODO: Update with actual API info
-            const response = await fetch(`/channels/${userId}`);
+            const userId = (await createClient().auth.getUser()).data.user!.id;
+            const response = await fetch(`${process.env.NEXT_PUBLIC_SOCKET_URL}/users/${userId}/channels`);
             const data = await response.json();
             if (response.ok) {
                 setChannels(data);
@@ -43,11 +43,8 @@ const ChannelBar: React.FC = () => {
     };
 
     useEffect(() => {
-        // Placeholder for user ID, replace with actual logic to get the logged-in user's ID
-        const userId = "placeholderUserId"; // Replace with actual user ID logic
-
         // Fetch channels for the logged-in user
-        fetchChannels(userId);
+        fetchChannels();
     }, []);
 
     return (
