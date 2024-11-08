@@ -39,6 +39,16 @@ export default function Chat({ user }: { user: User | null }) {
     client.on('connect', () => {
       console.log("Connected to SocketIO")
     })
+
+    client.on('connect_error', (error) => {
+      if (client.active) {
+        // temp failure, attempts to reconnect
+        console.log('[ERROR] Reconnecting...', error)
+      } else {
+        // connection denied by the server
+        console.log("Denied by the server: ", error)
+      }
+    })
   
     // Listener for incoming general chat messages
     // These will be the messages that are received real-time
