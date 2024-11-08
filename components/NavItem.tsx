@@ -1,3 +1,8 @@
+/**
+ * Represents a Link to a page
+ * To be used with the NavBar component
+ */
+
 "use client"
 
 import Link from 'next/link'

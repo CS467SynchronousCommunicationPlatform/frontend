@@ -1,18 +1,21 @@
-// components/Message.tsx
+/**
+ * Represents a message sent to a channel
+ */
 import React from 'react';
-import styles from '../app/ChatPage.module.css';
+import styles from '@/app/ChatPage.module.css';
 
-interface MessageProps {
-  user: string;
+// Represents format of messages between frontend and backend
+export interface MessageProps {
+  user: string | undefined;
+  body: string;
   timestamp: string;
-  content: string;
 }
 
-const Message: React.FC<MessageProps> = ({ user, timestamp, content }) => {
+const Message: React.FC<MessageProps> = ({ user, body, timestamp }) => {
   return (
     <div className={styles.message}>
       <span className={styles.user}>{user}</span> <span className={styles.timestamp}>{timestamp}</span>
-      <p>{content}</p>
+      <p>{body}</p>
     </div>
   );
 };

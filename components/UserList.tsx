@@ -1,4 +1,6 @@
-// components/RightSidebar.tsx
+/**
+ * Represents a list of online, offline, and away Users
+ */
 import React from 'react';
 import styles from '../app/ChatPage.module.css';
 

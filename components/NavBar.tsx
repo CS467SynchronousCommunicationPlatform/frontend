@@ -1,6 +1,10 @@
+/**
+ * Navigation bar, applied to default page layout
+ */
+
 "use client"
 
-import { NavItem } from '@/components/nav-item'
+import { NavItem } from '@/components/NavItem'
 
 export function NavBar() {
     return (
