@@ -1,6 +1,8 @@
-// components/Message.tsx
+/**
+ * Represents a message sent to a channel
+ */
 import React from 'react';
-import styles from '../app/ChatPage.module.css';
+import styles from '@/app/ChatPage.module.css';
 
 // Represents format of messages between frontend and backend
 export interface MessageProps {
