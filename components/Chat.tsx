@@ -2,7 +2,7 @@
  * Initializes a socket.io client connection. Auth token is user.id
  * Socket connections must be rendered client-side and Nextjs renders server-side
  * by default, so this file must be marked with the 'use client' directive
- * Source: https://socket.io/how-to/use-with-nextjs#client 
+ * Source: https://socket.io/how-to/use-with-react 
  * TOOD: Add error handling
  */
 
@@ -12,7 +12,7 @@ import { useEffect, useState } from 'react'
 import { socket, updateSocketAuth } from '@/socket'
 //import { Socket } from 'socket.io-client'
 import { type User } from "@supabase/supabase-js"
-import {  MessageProps } from '@/components/Message'
+import { MessageProps } from '@/utils/types/types'
 import ChatInput, { ChatInputProps } from '@/components/ChatInput'
 import PreviousMessages from '@/components/PreviousMessages'
 import ChannelBar from '@/components/ChannelBar'
@@ -20,34 +20,37 @@ import UserList from '@/components/UserList'
 import styles from '@/app/ChatPage.module.css'
 
 
-export default function Chat({ user }: { user: User | null }) {
+export default function Chat({ user, previousMessages }: { user: User, previousMessages: MessageProps[] }) {
   const [msgBody, setMsgBody] = useState<string>('')
-  const [msgHistory, setMsgHistory] = useState<MessageProps[]>([])
+  const [msgHistory, setMsgHistory] = useState<MessageProps[]>(previousMessages)
   const [isConnected, setIsConnected] = useState(socket.connected)
 
+
   useEffect(() => {
-    if (user?.id) {
-      updateSocketAuth(user.id)
-    }
+    updateSocketAuth(user.id)
     socket.connect()
 
     return () => {
+      // When the user logs out or closes the page, disconnect the socket
       socket.disconnect()
     }
-  }, [user?.id])
+  }, [user.id])
 
   useEffect(() => {
     const onConnect = () => {
       setIsConnected(true)
     }
-
-    const onDisconnect = () => {
+    // If there is a connection error, try again with the auth token
+    const onError = (err: Error) => {
       setIsConnected(false)
-    }
-
-    const onError = () => {
-      if (user?.id) {
+      if (socket.active) {
+        // Temporary failure, not denied by the server
+        // update auth token and retry
         updateSocketAuth(user.id)
+      } else {
+        // connection was denied by the server, disconnect the socket
+        console.log(err.message)
+        socket.disconnect()
       }
     }
   
@@ -56,19 +59,16 @@ export default function Chat({ user }: { user: User | null }) {
     }
 
     socket.on('connect', onConnect)  
-    // TODO: load previous channel messages from Supabase and display
     socket.on('general', onIncomingMessage)
-    socket.on('disconnect', onDisconnect)
     socket.on('connect_error', onError)
 
     // Cleanup event listeners
     return () => {
       socket.off('connect', onConnect)
-      socket.off('disconnect', onDisconnect)
       socket.off('connect_error', onError)
       socket.off('general', onIncomingMessage)
     }
-  }, [msgHistory, user?.id])
+  }, [msgHistory, user.id])
 
   // Send a message to the general channel
   // TODO: Generalize this to send to the specified channel
@@ -76,7 +76,7 @@ export default function Chat({ user }: { user: User | null }) {
     event.preventDefault()
     if (isConnected) {
       const message: MessageProps = {
-        user: user?.id,
+        user: user.id,
         body: msgBody,
         timestamp: new Date().toISOString()
       }
