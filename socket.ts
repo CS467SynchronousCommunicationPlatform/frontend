@@ -5,15 +5,16 @@ import { io } from "socket.io-client"
 const url = process.env.NEXT_PUBLIC_SOCKET_URL
 
 /**
- * Add comment here
- * Establish the socket manager
- * 
+ * Establish the socket manager and set autoConnect to false to avoid constant
+ * connection errors while the server waits for a user id
+ * TODO: set up event maps for the Socket type
  */
 export const socket = io(url, {
     transports: ["websocket"],
     autoConnect: false,
 })
 
+// Need user id for auth token, so set it up later
 export const updateSocketAuth = (token: string) => {
     socket.auth = { token }
 }
