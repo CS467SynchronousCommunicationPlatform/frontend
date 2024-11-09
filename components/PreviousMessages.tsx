@@ -2,8 +2,10 @@
  * Represents the previous messages in a channel
  */
 import React from 'react';
-import Message, { MessageProps } from '@/components/Message';
+import Message from '@/components/Message';
+import { MessageProps } from '@/utils/types/types'
 import styles from '@/app/ChatPage.module.css';
+
 
 export default function PreviousMessages({ messages }: { messages: MessageProps[] }) {
     return (
