@@ -9,7 +9,8 @@
 "use client";
 
 import { useEffect, useState } from 'react'
-import { io, Socket } from 'socket.io-client'
+import { socket, updateSocketAuth } from '@/socket'
+//import { Socket } from 'socket.io-client'
 import { type User } from "@supabase/supabase-js"
 import {  MessageProps } from '@/components/Message'
 import ChatInput, { ChatInputProps } from '@/components/ChatInput'
@@ -18,50 +19,62 @@ import ChannelBar from '@/components/ChannelBar'
 import UserList from '@/components/UserList'
 import styles from '@/app/ChatPage.module.css'
 
-// The URL to the Socket.IO server
-const socketUrl = process.env.NEXT_PUBLIC_SOCKET_URL
 
 export default function Chat({ user }: { user: User | null }) {
   const [msgBody, setMsgBody] = useState<string>('')
   const [msgHistory, setMsgHistory] = useState<MessageProps[]>([])
-  const [socket, setSocket] = useState<Socket | null>(null)
+  const [isConnected, setIsConnected] = useState(socket.connected)
 
-  // Establish the socket connection with user id as auth token
-  // Wrap it in a useEffect to prevent reconnections on every render
   useEffect(() => {
-    const client = io(socketUrl, {
-      auth: {
-        token: user?.id
-      },
-      transports: ["websocket"]
-    })
-  
-    client.on('connect', () => {
-      console.log("Connected to SocketIO")
-    })
-  
-    // Listener for incoming general chat messages
-    // These will be the messages that are received real-time
-    // TODO: load previous channel messages from Supabase and display
-    client.on('general', (message: MessageProps) => {
-      setMsgHistory([...msgHistory, message])
-    })
+    if (user?.id) {
+      updateSocketAuth(user.id)
+    }
+    socket.connect()
 
-    setSocket(client)
+    return () => {
+      socket.disconnect()
+    }
+  }, [user?.id])
+
+  useEffect(() => {
+    const onConnect = () => {
+      setIsConnected(true)
+    }
+
+    const onDisconnect = () => {
+      setIsConnected(false)
+    }
+
+    const onError = () => {
+      if (user?.id) {
+        updateSocketAuth(user.id)
+      }
+    }
+  
+    const onIncomingMessage = (message: MessageProps) => {
+      setMsgHistory([...msgHistory, message])
+    }
+
+    socket.on('connect', onConnect)  
+    // TODO: load previous channel messages from Supabase and display
+    socket.on('general', onIncomingMessage)
+    socket.on('disconnect', onDisconnect)
+    socket.on('connect_error', onError)
 
     // Cleanup event listeners
-    // Disconnect socket connection on unmount
     return () => {
-      client.off()
-      client.disconnect()
+      socket.off('connect', onConnect)
+      socket.off('disconnect', onDisconnect)
+      socket.off('connect_error', onError)
+      socket.off('general', onIncomingMessage)
     }
-  }, [user?.id, msgHistory])
+  }, [msgHistory, user?.id])
 
   // Send a message to the general channel
   // TODO: Generalize this to send to the specified channel
   const sendGeneralMessage = (event: React.FormEvent) => {
     event.preventDefault()
-    if (socket) {
+    if (isConnected) {
       const message: MessageProps = {
         user: user?.id,
         body: msgBody,
