@@ -17,28 +17,36 @@ const fakeChannels: Channel[] = [
     { name: 'User38475, User23'},
 ];
 
+
 const ChannelBar: React.FC = () => {
     // State to store channel data and error status
     const [channels, setChannels] = useState<Channel[]>([]);
-    const [apiError, setApiError] = useState<boolean>(false);
+    const [apiError, setApiError] = useState<string | null>(null);
 
     // Fetch channels the user belongs to
     const fetchChannels = async () => {
         try {
             const userId = (await createClient().auth.getUser()).data.user!.id;
             const response = await fetch(`${process.env.BACKEND_API}/users/${userId}/channels`);
-            const data = await response.json();
-            if (response.ok) {
-                setChannels(data);
+
+            // Check response type
+            const contentType = response.headers.get("content-type");
+            if (contentType && contentType.includes("application/json")) {
+                const data = await response.json();
+                if (response.ok) {
+                    setChannels(data);
+                } else {
+                    setApiError(`Failed to fetch channels: ${data.error}`);
+                    setChannels(fakeChannels);
+                }
             } else {
-                setApiError(true);
+                const text = await response.text();
+                setApiError(`Unexpected response format: ${text.substring(0, 100)}`);
                 setChannels(fakeChannels);
-                console.error("Failed to fetch channels", data);
             }
         } catch (error) {
-            setApiError(true);
+            setApiError(`Error fetching channels: ${error.message}`);
             setChannels(fakeChannels);
-            console.error("Error fetching channels", error);
         }
     };
 
