@@ -47,6 +47,7 @@ const ChannelBar: React.FC = () => {
                 setChannels(fakeChannels);
             }
         } catch (error) {
+            console.log(error);
             if (error instanceof Error) {
                 setApiError(`Error fetching channels: ${error.message}`);
             } else {
@@ -55,6 +56,7 @@ const ChannelBar: React.FC = () => {
             setChannels(fakeChannels);
         }
     };
+
 
     useEffect(() => {
         // Fetch channels for the logged-in user
