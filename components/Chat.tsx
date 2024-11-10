@@ -10,17 +10,21 @@
 
 import { useEffect, useState } from 'react'
 import { socket, updateSocketAuth } from '@/socket'
-//import { Socket } from 'socket.io-client'
 import { type User } from "@supabase/supabase-js"
-import { MessageProps } from '@/utils/types/types'
+import { MessageProps, Channel } from '@/utils/types/types'
 import ChatInput, { ChatInputProps } from '@/components/ChatInput'
 import PreviousMessages from '@/components/PreviousMessages'
-import ChannelBar from '@/components/ChannelBar'
 import UserList from '@/components/UserList'
+import ChannelBar from '@/components/ChannelBar';
 import styles from '@/app/ChatPage.module.css'
 
-
-export default function Chat({ user, previousMessages }: { user: User, previousMessages: MessageProps[] }) {
+/**
+ * The Chat component is the real-time layer of our application
+ * 
+ * @param param0 
+ * @returns 
+ */
+export default function Chat({ user, previousMessages, channels }: { user: User, previousMessages: MessageProps[], channels: Channel[] }) {
   const [msgBody, setMsgBody] = useState<string>('')
   const [msgHistory, setMsgHistory] = useState<MessageProps[]>(previousMessages)
   const [isConnected, setIsConnected] = useState(socket.connected)
@@ -29,6 +33,7 @@ export default function Chat({ user, previousMessages }: { user: User, previousM
   useEffect(() => {
     updateSocketAuth(user.id)
     socket.connect()
+    console.log('Client connected')
 
     return () => {
       // When the user logs out or closes the page, disconnect the socket
@@ -97,7 +102,7 @@ export default function Chat({ user, previousMessages }: { user: User, previousM
 
   return (
     <div className={styles.container}>
-      <ChannelBar />
+      <ChannelBar channels={channels} />
       <PreviousMessages messages={msgHistory} />
       <ChatInput handlers={inputHandlers} />
       <UserList />

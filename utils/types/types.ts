@@ -1,8 +1,8 @@
-/**
- * Types
- */
 
-// interact with GET /channels/:channelId/messages
+/**
+ * Interface for communicating with the REST API
+ * /channels/:channelId/messages
+ */
 export interface ChannelMessage {
     body: string;
     created_at: string
@@ -11,9 +11,20 @@ export interface ChannelMessage {
     };
 }
 
-// Communication format of socket messages sent between frontend and backend 
+/**
+ * Communication format of socket messages sent between frontend and backend 
+ */
 export interface MessageProps {
     user: string;
     body: string;
     timestamp: string;
-  }
+}
+
+/**
+ * Interface for communicating with the REST API
+ * /users/:userId/channels
+ */
+export interface Channel {
+    name: string;
+    description: string;
+}

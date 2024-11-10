@@ -3,7 +3,8 @@ import React from 'react';
 import Chat from "@/components/Chat";
 import { createClient } from '@/utils/supabase/server'
 import { redirect } from 'next/navigation'
-import { MessageProps, ChannelMessage } from '@/utils/types/types'
+import { MessageProps, ChannelMessage, Channel } from '@/utils/types/types'
+
 
 /**
  *  The URL to the backend REST API
@@ -45,9 +46,27 @@ const ChatPage: React.FC = async () => {
     console.log('Failed to receive general chat messages: ', error)
     //redirect('/error')
   }
+  // fetch channels
+  let channels: Channel[] = []
+  try {
+    const chanResponse = await fetch(api + `/users/${user.id}/channels`, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+    })
+    if (chanResponse.ok) {
+      const chanData = await chanResponse.json()
+      channels = chanData
+    }
+  } catch (error) {
+    console.log('Failed to get channels for user: ', error)
+  }
   
   return (
-    <Chat user={user} previousMessages={previous} />
+
+    <Chat user={user} previousMessages={previous} channels={channels}/>
+
   );
 };
 
