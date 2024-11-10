@@ -2,68 +2,81 @@
  * Initializes a socket.io client connection. Auth token is user.id
  * Socket connections must be rendered client-side and Nextjs renders server-side
  * by default, so this file must be marked with the 'use client' directive
- * Source: https://socket.io/how-to/use-with-nextjs#client 
+ * Source: https://socket.io/how-to/use-with-react 
  * TOOD: Add error handling
  */
 
 "use client";
 
 import { useEffect, useState } from 'react'
-import { io, Socket } from 'socket.io-client'
+import { socket, updateSocketAuth } from '@/socket'
+//import { Socket } from 'socket.io-client'
 import { type User } from "@supabase/supabase-js"
-import {  MessageProps } from '@/components/Message'
+import { MessageProps } from '@/utils/types/types'
 import ChatInput, { ChatInputProps } from '@/components/ChatInput'
 import PreviousMessages from '@/components/PreviousMessages'
 import ChannelBar from '@/components/ChannelBar'
 import UserList from '@/components/UserList'
 import styles from '@/app/ChatPage.module.css'
 
-// The URL to the Socket.IO server
-const socketUrl = process.env.NEXT_PUBLIC_SOCKET_URL
 
-export default function Chat({ user }: { user: User | null }) {
+export default function Chat({ user, previousMessages }: { user: User, previousMessages: MessageProps[] }) {
   const [msgBody, setMsgBody] = useState<string>('')
-  const [msgHistory, setMsgHistory] = useState<MessageProps[]>([])
-  const [socket, setSocket] = useState<Socket | null>(null)
+  const [msgHistory, setMsgHistory] = useState<MessageProps[]>(previousMessages)
+  const [isConnected, setIsConnected] = useState(socket.connected)
 
-  // Establish the socket connection with user id as auth token
-  // Wrap it in a useEffect to prevent reconnections on every render
+
   useEffect(() => {
-    const client = io(socketUrl, {
-      auth: {
-        token: user?.id
-      },
-      transports: ["websocket"]
-    })
-  
-    client.on('connect', () => {
-      console.log("Connected to SocketIO")
-    })
-  
-    // Listener for incoming general chat messages
-    // These will be the messages that are received real-time
-    // TODO: load previous channel messages from Supabase and display
-    client.on('general', (message: MessageProps) => {
-      setMsgHistory([...msgHistory, message])
-    })
+    updateSocketAuth(user.id)
+    socket.connect()
 
-    setSocket(client)
+    return () => {
+      // When the user logs out or closes the page, disconnect the socket
+      socket.disconnect()
+    }
+  }, [user.id])
+
+  useEffect(() => {
+    const onConnect = () => {
+      setIsConnected(true)
+    }
+    // If there is a connection error, try again with the auth token
+    const onError = (err: Error) => {
+      setIsConnected(false)
+      if (socket.active) {
+        // Temporary failure, not denied by the server
+        // update auth token and retry
+        updateSocketAuth(user.id)
+      } else {
+        // connection was denied by the server, disconnect the socket
+        console.log(err.message)
+        socket.disconnect()
+      }
+    }
+  
+    const onIncomingMessage = (message: MessageProps) => {
+      setMsgHistory([...msgHistory, message])
+    }
+
+    socket.on('connect', onConnect)  
+    socket.on('general', onIncomingMessage)
+    socket.on('connect_error', onError)
 
     // Cleanup event listeners
-    // Disconnect socket connection on unmount
     return () => {
-      client.off()
-      client.disconnect()
+      socket.off('connect', onConnect)
+      socket.off('connect_error', onError)
+      socket.off('general', onIncomingMessage)
     }
-  }, [user?.id, msgHistory])
+  }, [msgHistory, user.id])
 
   // Send a message to the general channel
   // TODO: Generalize this to send to the specified channel
   const sendGeneralMessage = (event: React.FormEvent) => {
     event.preventDefault()
-    if (socket) {
+    if (isConnected) {
       const message: MessageProps = {
-        user: user?.id,
+        user: user.id,
         body: msgBody,
         timestamp: new Date().toISOString()
       }

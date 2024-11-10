@@ -3,13 +3,7 @@
  */
 import React from 'react';
 import styles from '@/app/ChatPage.module.css';
-
-// Represents format of messages between frontend and backend
-export interface MessageProps {
-  user: string | undefined;
-  body: string;
-  timestamp: string;
-}
+import { MessageProps } from '@/utils/types/types'
 
 const Message: React.FC<MessageProps> = ({ user, body, timestamp }) => {
   return (
