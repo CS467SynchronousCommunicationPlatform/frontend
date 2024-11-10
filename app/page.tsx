@@ -8,7 +8,7 @@ import { MessageProps, ChannelMessage } from '@/utils/types/types'
 /**
  *  The URL to the backend REST API
  */
-const api: string = process.env.BACKEND_API!
+const api: string = process.env.NEXT_PUBLIC_BACKEND_API!
 
 const ChatPage: React.FC = async () => {
   // Check if user is authenticated
