@@ -41,6 +41,8 @@ const ChannelBar: React.FC = () => {
                 }
             } else {
                 const text = await response.text();
+                // Log the HTML response to the console
+                console.log(`Received unexpected response format: ${text}`);
                 setApiError(`Unexpected response format: ${text.substring(0, 100)}`);
                 setChannels(fakeChannels);
             }
