@@ -26,7 +26,7 @@ const ChannelBar: React.FC = () => {
     const fetchChannels = async () => {
         try {
             const userId = (await createClient().auth.getUser()).data.user!.id;
-            const response = await fetch(`${process.env.SCP_BACKEND_URL}/users/${userId}/channels`);
+            const response = await fetch(`${process.env.BACKEND_API}/users/${userId}/channels`);
             const data = await response.json();
             if (response.ok) {
                 setChannels(data);
