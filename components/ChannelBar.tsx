@@ -45,7 +45,11 @@ const ChannelBar: React.FC = () => {
                 setChannels(fakeChannels);
             }
         } catch (error) {
-            setApiError(`Error fetching channels: ${error.message}`);
+            if (error instanceof Error) {
+                setApiError(`Error fetching channels: ${error.message}`);
+            } else {
+                setApiError(`Error fetching channels: ${String(error)}`);
+            }
             setChannels(fakeChannels);
         }
     };
