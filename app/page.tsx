@@ -43,7 +43,7 @@ const ChatPage: React.FC = async () => {
     }
   } catch (error) {
     console.log('Failed to receive general chat messages: ', error)
-    redirect('/error')
+    //redirect('/error')
   }
   
   return (
