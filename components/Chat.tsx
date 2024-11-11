@@ -18,10 +18,15 @@ import UserList from '@/components/UserList'
 import ChannelBar from '@/components/ChannelBar';
 import styles from '@/app/ChatPage.module.css'
 
+
 /**
  * The Chat component is the real-time layer of our application
- * 
- * @param param0 
+ * It connects the user to our backend socket server and allows them to send
+ * messages to any channels they are currently subscribed to.
+ * @TODO: Generalize sendMessage handler to send the message to whatever channel is currently selected
+ * @param user: the user authenticated through Supabase - is a Supabase User type
+ * @param previousMessages: an array of the previous messages of a channel
+ * @param channels: the channels the user is subscribed to
  * @returns 
  */
 export default function Chat({ user, previousMessages, channels }: { user: User, previousMessages: MessageProps[], channels: Channel[] }) {
