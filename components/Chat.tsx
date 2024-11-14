@@ -31,7 +31,7 @@ import styles from '@/app/ChatPage.module.css'
 export default function Chat({ user, previousMessages, channels }: { user: User, previousMessages: Map<number, MessageProps[]>, channels: Channel[] }) {
   const [msgBody, setMsgBody] = useState<string>('')
   const [currentChannel, setCurrentChannel] = useState<number>(4)
-  // 
+  // define a state variable for all messages, avoid mutating previousMessages since its a prop
   const [allMessages, setAllMessages] = useState<Map<number, MessageProps[]>>(new Map(previousMessages))
   // set the msgHistory to general at first. If undefined set it to an empty array (ts error)
   const [msgHistory, setMsgHistory] = useState<MessageProps[]>(previousMessages.get(4) || [])
