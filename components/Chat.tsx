@@ -31,6 +31,8 @@ import styles from '@/app/ChatPage.module.css'
 export default function Chat({ user, previousMessages, channels }: { user: User, previousMessages: Map<number, MessageProps[]>, channels: Channel[] }) {
   const [msgBody, setMsgBody] = useState<string>('')
   const [currentChannel, setCurrentChannel] = useState<number>(4)
+  // 
+  const [allMessages, setAllMessages] = useState<Map<number, MessageProps[]>>(new Map(previousMessages))
   // set the msgHistory to general at first. If undefined set it to an empty array (ts error)
   const [msgHistory, setMsgHistory] = useState<MessageProps[]>(previousMessages.get(4) || [])
   const [isConnected, setIsConnected] = useState(socket.connected)
@@ -47,11 +49,12 @@ export default function Chat({ user, previousMessages, channels }: { user: User,
     }
   }, [user.id])
 
-  // Update msgHistory when currentChannel changes
+  // Update msgHistory when currentChannel or allMessages changes
   useEffect(() => {
-    setMsgHistory(previousMessages.get(currentChannel)!)
-  }, [currentChannel, previousMessages])
+    setMsgHistory(allMessages.get(currentChannel)!)
+  }, [currentChannel, allMessages])
 
+  // Socket event handlers
   useEffect(() => {
     const onConnect = () => {
       setIsConnected(true)
@@ -72,13 +75,12 @@ export default function Chat({ user, previousMessages, channels }: { user: User,
     
     // Listens for incoming messages, adds the incoming message to message history
     const onIncomingMessage = (message: MessageProps) => {
-      if (message.channel_id === currentChannel) {
-        setMsgHistory((prevMsgHistory) => [...prevMsgHistory, message])
-      } else {
-        // This should not ever return undefined, using non-null assertion
-        // operator to silence ts errors
-        previousMessages.get(message.channel_id)!.push(message)
-      }
+      setAllMessages((prevAllMessages) => {
+        const newAllMessages = new Map(prevAllMessages)
+        const channelMessages = allMessages.get(message.channel_id) || []
+        newAllMessages.set(message.channel_id, [...channelMessages, message])
+        return newAllMessages
+      })
     }
 
     socket.on('connect', onConnect)  
@@ -91,7 +93,7 @@ export default function Chat({ user, previousMessages, channels }: { user: User,
       socket.off('connect_error', onError)
       socket.off('chat', onIncomingMessage)
     }
-  }, [user.id, previousMessages, currentChannel])
+  }, [user.id, currentChannel])
 
   // Send a message to the selected channel
   const sendMessage = (event: React.FormEvent) => {
@@ -103,7 +105,6 @@ export default function Chat({ user, previousMessages, channels }: { user: User,
         body: msgBody,
         timestamp: new Date().toISOString()
       }
-      console.log(message)
       socket.emit('chat', message)
       setMsgBody('')
     }
