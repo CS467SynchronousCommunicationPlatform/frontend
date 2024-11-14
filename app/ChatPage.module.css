@@ -46,7 +46,7 @@
 .chatSection {
     flex: 1;
     display: flex;
-    flex-direction: column;
+    flex-direction: column;    
 }
 
 .chatHeader {
@@ -77,17 +77,31 @@
 }
 
 .messageInput {
-    padding: 10px;
+    padding: 5px;
     background-color: #40444b;
     border: none;
     color: white;
-    width: 100%;
+    width: 50%;
+    flex: 1;
+    margin-right: 10px;
 }
 
 .chatInputContainer {
     padding: 10px;
     background-color: #40444b;
     border-top: 1px solid #202225;
+}
+
+.chatInputContainer button {
+    background-color: #526fda;
+    color: white;
+    border: none;
+    padding: 10px;
+    cursor: pointer;
+}
+
+.chatForm {
+    display: flex;
 }
 
 .sidebarRight {
