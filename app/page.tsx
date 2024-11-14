@@ -33,26 +33,7 @@ export default async function Page() {
       return redirect('/login')
   }
 
-  // fetch previous messages
-  // for now hardcoding general
-  let previous: MessageProps[] = []
-  try {
-    const response = await fetch(api + '/channels/4/messages', apiHeaders)
-
-    if (response.ok) {
-      const data = await response.json()
-      // Map the differences between api and socket formats
-      previous = data.map((message: ChannelMessage) => ({
-        user: message.users.display_name,
-        body: message.body,
-        timestamp: message.created_at
-      }))
-    }
-  } catch (error) {
-    console.log('Failed to receive general chat messages: ', error)
-    //redirect('/error')
-  }
-  // fetch channels
+  // fetch all channels the user is subscribed to
   let channels: Channel[] = []
   try {
     const chanResponse = await fetch(api + `/users/${user.id}/channels`, apiHeaders)
@@ -64,7 +45,29 @@ export default async function Page() {
     console.log('Failed to get channels for user: ', error)
   }
 
+  // fetch previous messages
+  // k: channel_id v: an array of all messages received
+  const previousMessages = new Map<number, MessageProps[]>
+  for (const channel of channels) {
+    try {
+      const response = await fetch(`${api}/channels/${channel.id}/messages`, apiHeaders)
+      if (response.ok) {
+        const data = await response.json()
+        // Map the differences between api and socket formats
+        const messages: MessageProps[] = data.map((message: ChannelMessage) => ({
+          user: message.users.display_name,
+          body: message.body,
+          channel_id: channel.id,
+          timestamp: message.created_at
+        }))
+        previousMessages.set(channel.id, messages)
+      }
+    } catch (error) {
+      console.log(`Failed to retrieve messages for channel ${channel.id}`, error)
+    }
+  }
+
   return (
-    <Chat user={user} previousMessages={previous} channels={channels}/>
+    <Chat user={user} previousMessages={previousMessages} channels={channels}/>
   )
 }
