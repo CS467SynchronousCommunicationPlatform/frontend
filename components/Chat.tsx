@@ -34,7 +34,6 @@ export default function Chat({ user, previousMessages, channels }: { user: User,
   // set the msgHistory to general at first. If undefined set it to an empty array (ts error)
   const [msgHistory, setMsgHistory] = useState<MessageProps[]>(previousMessages.get(4) || [])
   const [isConnected, setIsConnected] = useState(socket.connected)
-  console.log(previousMessages.get(4))
 
   // On page load, connect to the socket
   useEffect(() => {
@@ -47,6 +46,11 @@ export default function Chat({ user, previousMessages, channels }: { user: User,
       socket.disconnect()
     }
   }, [user.id])
+
+  // Update msgHistory when currentChannel changes
+  useEffect(() => {
+    setMsgHistory(previousMessages.get(currentChannel)!)
+  }, [currentChannel, previousMessages])
 
   useEffect(() => {
     const onConnect = () => {
@@ -69,7 +73,7 @@ export default function Chat({ user, previousMessages, channels }: { user: User,
     // Listens for incoming messages, adds the incoming message to message history
     const onIncomingMessage = (message: MessageProps) => {
       if (message.channel_id === currentChannel) {
-        setMsgHistory([...msgHistory, message])
+        setMsgHistory((prevMsgHistory) => [...prevMsgHistory, message])
       } else {
         // This should not ever return undefined, using non-null assertion
         // operator to silence ts errors
@@ -87,7 +91,7 @@ export default function Chat({ user, previousMessages, channels }: { user: User,
       socket.off('connect_error', onError)
       socket.off('chat', onIncomingMessage)
     }
-  }, [msgHistory, user.id, previousMessages, currentChannel])
+  }, [user.id, previousMessages, currentChannel])
 
   // Send a message to the selected channel
   const sendMessage = (event: React.FormEvent) => {
@@ -99,6 +103,7 @@ export default function Chat({ user, previousMessages, channels }: { user: User,
         body: msgBody,
         timestamp: new Date().toISOString()
       }
+      console.log(message)
       socket.emit('chat', message)
       setMsgBody('')
     }
@@ -106,13 +111,12 @@ export default function Chat({ user, previousMessages, channels }: { user: User,
   /**
    * onClick handler for when a user selects a channel
    * Set the current channel and load appropriate messages
-   * @param channel_id 
+   * @param channel_id the channel_id of the selected channel
+   * @param event MouseEvent because the ChannelBar consists of li elements
    */
   const selectChannel = (channel_id: number, event: React.MouseEvent<HTMLLIElement>) => {
     console.log(event)
     setCurrentChannel(channel_id)
-    // Should never be null
-    setMsgHistory(previousMessages.get(channel_id)!)
   }
 
   const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
