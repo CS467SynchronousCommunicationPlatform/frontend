@@ -2,17 +2,20 @@
 
 import styles from '@/app/ChatPage.module.css';
 import { signout } from '@/app/login/actions';
-import { Channel } from '@/utils/types/types'
+import { Channel, ChannelHandler } from '@/utils/types/types'
 
-
-export default function ChannelBar({ channels }: { channels: Channel[] }) {
+export default function ChannelBar({ channels, handler }: { channels: Channel[], handler: ChannelHandler }) {
     return (
         <div className={styles.sidebarLeft}>
             <h3>Channels</h3>
             <ul>
                 {Array.isArray(channels) &&
                 channels.map((channel, index) => (
-                    <li key={index} className={styles.channel}>
+                    <li 
+                        key={index} 
+                        className={styles.channel}
+                        onClick={(event) => handler.onClick(channel.id, event)}
+                    >
                         {channel.name}
                     </li>
                 ))}
