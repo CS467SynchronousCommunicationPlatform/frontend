@@ -14,6 +14,7 @@ export default function PreviousMessages({ messages }: { messages: MessageProps[
                 <Message
                     key={index}
                     user={message.user}
+                    channel_id={message.channel_id}
                     timestamp={message.timestamp}
                     body={message.body}
                 />

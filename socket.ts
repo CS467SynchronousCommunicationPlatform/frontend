@@ -2,7 +2,7 @@
 
 import { io } from "socket.io-client"
 
-const url = process.env.NEXT_PUBLIC_BACKEND_API
+const url: string = process.env.NEXT_PUBLIC_BACKEND_API!
 
 /**
  * Establish the socket manager and set autoConnect to false to avoid constant

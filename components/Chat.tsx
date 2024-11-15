@@ -10,25 +10,38 @@
 
 import { useEffect, useState } from 'react'
 import { socket, updateSocketAuth } from '@/socket'
-//import { Socket } from 'socket.io-client'
 import { type User } from "@supabase/supabase-js"
-import { MessageProps } from '@/utils/types/types'
-import ChatInput, { ChatInputProps } from '@/components/ChatInput'
+import { MessageProps, Channel, ChannelHandler, ChatInputProps } from '@/utils/types/types'
+import ChatInput from '@/components/ChatInput'
 import PreviousMessages from '@/components/PreviousMessages'
-import ChannelBar from '@/components/ChannelBar'
 import UserList from '@/components/UserList'
+import ChannelBar from '@/components/ChannelBar';
 import styles from '@/app/ChatPage.module.css'
 
 
-export default function Chat({ user, previousMessages }: { user: User, previousMessages: MessageProps[] }) {
+/**
+ * The Chat component is the real-time layer of our application
+ * It connects the user to our backend socket server and allows them to send
+ * messages to any channels they are currently subscribed to.
+ * @param user: the user authenticated through Supabase - is a Supabase User type
+ * @param previousMessages: a map of all of the previous messages in channels the user is subscribed to
+ * @param channels: the channels the user is subscribed to
+ * @returns 
+ */
+export default function Chat({ user, previousMessages, channels }: { user: User, previousMessages: Map<number, MessageProps[]>, channels: Channel[] }) {
   const [msgBody, setMsgBody] = useState<string>('')
-  const [msgHistory, setMsgHistory] = useState<MessageProps[]>(previousMessages)
+  const [currentChannel, setCurrentChannel] = useState<number>(4)
+  // define a state variable for all messages, avoid mutating previousMessages since its a prop
+  const [allMessages, setAllMessages] = useState<Map<number, MessageProps[]>>(new Map(previousMessages))
+  // set the msgHistory to general at first. If undefined set it to an empty array (ts error)
+  const [msgHistory, setMsgHistory] = useState<MessageProps[]>(previousMessages.get(4) || [])
   const [isConnected, setIsConnected] = useState(socket.connected)
 
-
+  // On page load, connect to the socket
   useEffect(() => {
     updateSocketAuth(user.id)
     socket.connect()
+    console.log('[SOCKET] Client connected')
 
     return () => {
       // When the user logs out or closes the page, disconnect the socket
@@ -36,6 +49,12 @@ export default function Chat({ user, previousMessages }: { user: User, previousM
     }
   }, [user.id])
 
+  // Update msgHistory when currentChannel or allMessages changes
+  useEffect(() => {
+    setMsgHistory(allMessages.get(currentChannel)!)
+  }, [currentChannel, allMessages])
+
+  // Socket event handlers
   useEffect(() => {
     const onConnect = () => {
       setIsConnected(true)
@@ -53,36 +72,52 @@ export default function Chat({ user, previousMessages }: { user: User, previousM
         socket.disconnect()
       }
     }
-  
+    
+    // Listens for incoming messages, adds the incoming message to message history
     const onIncomingMessage = (message: MessageProps) => {
-      setMsgHistory([...msgHistory, message])
+      setAllMessages((prevAllMessages) => {
+        const newAllMessages = new Map(prevAllMessages)
+        const channelMessages = allMessages.get(message.channel_id) || []
+        newAllMessages.set(message.channel_id, [...channelMessages, message])
+        return newAllMessages
+      })
     }
 
     socket.on('connect', onConnect)  
-    socket.on('general', onIncomingMessage)
+    socket.on('chat', onIncomingMessage)
     socket.on('connect_error', onError)
 
     // Cleanup event listeners
     return () => {
       socket.off('connect', onConnect)
       socket.off('connect_error', onError)
-      socket.off('general', onIncomingMessage)
+      socket.off('chat', onIncomingMessage)
     }
-  }, [msgHistory, user.id])
+  }, [user.id, currentChannel])
 
-  // Send a message to the general channel
-  // TODO: Generalize this to send to the specified channel
-  const sendGeneralMessage = (event: React.FormEvent) => {
+  // Send a message to the selected channel
+  const sendMessage = (event: React.FormEvent) => {
     event.preventDefault()
     if (isConnected) {
       const message: MessageProps = {
         user: user.id,
+        channel_id: currentChannel,
         body: msgBody,
         timestamp: new Date().toISOString()
       }
-      socket.emit('general', message)
+      socket.emit('chat', message)
       setMsgBody('')
     }
+  }
+  /**
+   * onClick handler for when a user selects a channel
+   * Set the current channel and load appropriate messages
+   * @param channel_id the channel_id of the selected channel
+   * @param event MouseEvent because the ChannelBar consists of li elements
+   */
+  const selectChannel = (channel_id: number, event: React.MouseEvent<HTMLLIElement>) => {
+    console.log(event)
+    setCurrentChannel(channel_id)
   }
 
   const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -90,16 +125,22 @@ export default function Chat({ user, previousMessages }: { user: User, previousM
   }
 
   const inputHandlers: ChatInputProps = {
-    submitHandler: sendGeneralMessage,
+    submitHandler: sendMessage,
     onChangeHandler: handleInputChange,
     value: msgBody,
   }
 
+  const channelHandler: ChannelHandler = {
+    onClick: selectChannel
+  }
+
   return (
     <div className={styles.container}>
-      <ChannelBar />
-      <PreviousMessages messages={msgHistory} />
-      <ChatInput handlers={inputHandlers} />
+      <ChannelBar channels={channels} handler={channelHandler} />
+      <div className={styles.chatSection}>
+        <PreviousMessages messages={msgHistory} />
+        <ChatInput handlers={inputHandlers} />
+      </div>
       <UserList />
     </div>
   )
