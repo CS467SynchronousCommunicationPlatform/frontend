@@ -39,7 +39,6 @@ export default function ChatInput({ handlers }: { handlers: ChatInputProps }) {
             {showEmojiPicker && (
                 <EmojiPicker 
                     theme={Theme.AUTO} 
-                    className={styles.customEmojiPicker}
                     onEmojiClick={handlers.emojisHandler}
                 />
             )}
