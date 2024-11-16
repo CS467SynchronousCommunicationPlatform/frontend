@@ -1,3 +1,5 @@
+import { EmojiClickData } from "emoji-picker-react";
+
 /**
  * Interface for communicating with the REST API
  * /channels/:channelId/messages
@@ -31,12 +33,12 @@ export interface Channel {
 }
 
 /**
- * Function handlers to pass in for submit and onchange events, including the
- * default value
+ * Function handlers and values to pass in for the message input form
  */
 export interface ChatInputProps {
     submitHandler: (event: React.FormEvent) => void
     onChangeHandler: (event: React.ChangeEvent<HTMLInputElement>) => void
+    emojisHandler: (emojiData: EmojiClickData, event: MouseEvent) => void
     value: string
 }
 
