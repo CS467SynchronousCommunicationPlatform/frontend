@@ -1,37 +1,41 @@
-/**
- * Represents a list of online, offline, and away Users
- */
 import React from 'react';
 import styles from '../app/ChatPage.module.css';
+import { ChannelUser } from '@/utils/types/types';
 
-const RightSidebar: React.FC = () => {
+const UserList: React.FC<{ users: ChannelUser[] }> = ({ users }) => {
+    const onlineUsers = users.filter(user => user.status === 'online');
+    const awayUsers = users.filter(user => user.status === 'away');
+    const offlineUsers = users.filter(user => user.status === 'offline');
+
     return (
         <div className={styles.sidebarRight}>
             <h3>Status: Online</h3>
             <div className={styles.userStatus}>
                 <p>Online</p>
                 <ul>
-                    <li>User1</li>
-                    <li>User2</li>
-                    <li>User3</li>
+                    {onlineUsers.map(user => (
+                        <li key={user.id}>{user.name}</li>
+                    ))}
                 </ul>
             </div>
             <div className={styles.userStatus}>
                 <p>Away</p>
                 <ul>
-                    <li>User4</li>
+                    {awayUsers.map(user => (
+                        <li key={user.id}>{user.name}</li>
+                    ))}
                 </ul>
             </div>
             <div className={styles.userStatus}>
                 <p>Offline</p>
                 <ul>
-                    <li>User5</li>
-                    <li>User6</li>
-                    <li>User7</li>
+                    {offlineUsers.map(user => (
+                        <li key={user.id}>{user.name}</li>
+                    ))}
                 </ul>
             </div>
         </div>
     );
 };
 
-export default RightSidebar;
+export default UserList;

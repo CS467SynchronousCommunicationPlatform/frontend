@@ -11,7 +11,7 @@
 import { useEffect, useState } from 'react'
 import { socket, updateSocketAuth } from '@/socket'
 import { type User } from "@supabase/supabase-js"
-import { MessageProps, Channel, ChannelHandler, ChatInputProps } from '@/utils/types/types'
+import { MessageProps, Channel, ChannelHandler, ChatInputProps, ChannelUser } from '@/utils/types/types'
 import ChatInput from '@/components/ChatInput'
 import PreviousMessages from '@/components/PreviousMessages'
 import UserList from '@/components/UserList'
@@ -37,6 +37,8 @@ export default function Chat({ user, previousMessages, channels }: { user: User,
   // set the msgHistory to general at first. If undefined set it to an empty array (ts error)
   const [msgHistory, setMsgHistory] = useState<MessageProps[]>(previousMessages.get(4) || [])
   const [isConnected, setIsConnected] = useState(socket.connected)
+  //USER LOGIC
+  const [channelUsers, setChannelUsers] = useState<ChannelUser[]>([])
 
   // On page load, connect to the socket
   useEffect(() => {
@@ -53,6 +55,7 @@ export default function Chat({ user, previousMessages, channels }: { user: User,
   // Update msgHistory when currentChannel or allMessages changes
   useEffect(() => {
     setMsgHistory(allMessages.get(currentChannel)!)
+    fetchChannelUsers(currentChannel);
   }, [currentChannel, allMessages])
 
   // Socket event handlers
@@ -141,6 +144,28 @@ export default function Chat({ user, previousMessages, channels }: { user: User,
     onClick: selectChannel
   }
 
+const fetchChannelUsers = async (channelID: number) => {
+    const api = process.env.NEXT_PUBLIC_BACKEND_API!;
+    const apiHeaders = {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    };
+    try {
+      const response = await fetch(`${api}/channels/${channelID}/users`, apiHeaders);
+      if (response.ok) {
+        const users = await response.json();
+        setChannelUsers(users);
+      } else {
+        console.error('Failed to fetch users:', response.statusText);
+      }
+    } catch (error) {
+      console.error('Error with users', error);
+    }
+};
+
+
   return (
     <div className={styles.container}>
       <ChannelBar channels={channels} handler={channelHandler} />
@@ -148,7 +173,7 @@ export default function Chat({ user, previousMessages, channels }: { user: User,
         <PreviousMessages messages={msgHistory} />
         <ChatInput handlers={inputHandlers} />
       </div>
-      <UserList />
+      <UserList users={channelUsers}/>
     </div>
   )
 }
