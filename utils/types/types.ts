@@ -38,7 +38,8 @@ export interface Channel {
  */
 export interface ChannelUser {
     id: number;
-    name: string;
+    created_at: string;
+    display_name: string;
     status: 'online' | 'away' | 'offline';
 }
 

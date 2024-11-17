@@ -156,7 +156,8 @@ const fetchChannelUsers = async (channelID: number) => {
       const response = await fetch(`${api}/channels/${channelID}/users`, apiHeaders);
       if (response.ok) {
         const users = await response.json();
-        setChannelUsers(users);
+        const usersWithStatus = users.map((user: ChannelUser) => ({...user, status: 'online'}));
+        setChannelUsers(usersWithStatus);
       } else {
         console.error('Failed to fetch users:', response.statusText);
       }
