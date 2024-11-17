@@ -16,6 +16,7 @@ import ChatInput from '@/components/ChatInput'
 import PreviousMessages from '@/components/PreviousMessages'
 import UserList from '@/components/UserList'
 import ChannelBar from '@/components/ChannelBar';
+import { EmojiClickData } from 'emoji-picker-react'
 import styles from '@/app/ChatPage.module.css'
 
 
@@ -124,9 +125,15 @@ export default function Chat({ user, previousMessages, channels }: { user: User,
     setMsgBody(event.target.value)
   }
 
+  const handleEmojiClick = (emojiData: EmojiClickData, event: MouseEvent) => {
+    console.log(event)
+    setMsgBody((prevMsgBody) => prevMsgBody + emojiData.emoji)
+  }
+
   const inputHandlers: ChatInputProps = {
     submitHandler: sendMessage,
     onChangeHandler: handleInputChange,
+    emojisHandler: handleEmojiClick,
     value: msgBody,
   }
 
