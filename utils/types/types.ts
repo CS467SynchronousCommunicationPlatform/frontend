@@ -33,6 +33,16 @@ export interface Channel {
 }
 
 /**
+ * Interface for communicating with the REST API
+ * /channels/:channelID/users
+ */
+export interface ChannelUser {
+    id: number;
+    name: string;
+    status: 'online' | 'away' | 'offline';
+}
+
+/**
  * Function handlers and values to pass in for the message input form
  */
 export interface ChatInputProps {
