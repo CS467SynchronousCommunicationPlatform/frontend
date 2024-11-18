@@ -32,7 +32,7 @@ export default async function Page() {
   // fetch previous messages
   const previousMessages = await fetchAllPreviousMessages(channels)
 
-  // fetch all users in a channel
+  // fetch all users for all channels a user is subscribed to
   const channelUsers = await fetchChannelUsers(channels)
 
   return (
