@@ -29,7 +29,7 @@ import styles from '@/app/ChatPage.module.css'
  * @param channels: the channels the user is subscribed to
  * @returns 
  */
-export default function Chat({ user, previousMessages, channels }: { user: User, previousMessages: Map<number, MessageProps[]>, channels: Channel[] }) {
+export default function Chat({ user, previousMessages, channels, channelUsers }: { user: User, previousMessages: Map<number, MessageProps[]>, channels: Channel[], channelUsers: Map<number, ChannelUser[]> }) {
   const [msgBody, setMsgBody] = useState<string>('')
   const [currentChannel, setCurrentChannel] = useState<number>(4)
   // define a state variable for all messages, avoid mutating previousMessages since its a prop
@@ -37,8 +37,8 @@ export default function Chat({ user, previousMessages, channels }: { user: User,
   // set the msgHistory to general at first. If undefined set it to an empty array (ts error)
   const [msgHistory, setMsgHistory] = useState<MessageProps[]>(previousMessages.get(4) || [])
   const [isConnected, setIsConnected] = useState(socket.connected)
-  //USER LOGIC
-  const [channelUsers, setChannelUsers] = useState<ChannelUser[]>([])
+  // user list logic, set to general at first
+  const [userList, setUserList] = useState<ChannelUser[]>(channelUsers.get(4) || [])
 
   // On page load, connect to the socket
   useEffect(() => {
@@ -52,11 +52,11 @@ export default function Chat({ user, previousMessages, channels }: { user: User,
     }
   }, [user.id])
 
-  // Update msgHistory when currentChannel or allMessages changes
+  // Update msgHistory and userList when currentChannel or allMessages changes
   useEffect(() => {
-    setMsgHistory(allMessages.get(currentChannel)!)
-    fetchChannelUsers(currentChannel);
-  }, [currentChannel, allMessages])
+    setMsgHistory(allMessages.get(currentChannel) || [])
+    setUserList(channelUsers.get(currentChannel) || [])
+  }, [currentChannel, allMessages, channelUsers])
 
   // Socket event handlers
   useEffect(() => {
@@ -81,7 +81,7 @@ export default function Chat({ user, previousMessages, channels }: { user: User,
     const onIncomingMessage = (message: MessageProps) => {
       setAllMessages((prevAllMessages) => {
         const newAllMessages = new Map(prevAllMessages)
-        const channelMessages = allMessages.get(message.channel_id) || []
+        const channelMessages = prevAllMessages.get(message.channel_id) || []
         newAllMessages.set(message.channel_id, [...channelMessages, message])
         return newAllMessages
       })
@@ -99,7 +99,11 @@ export default function Chat({ user, previousMessages, channels }: { user: User,
     }
   }, [user.id, currentChannel])
 
-  // Send a message to the selected channel
+  /**
+   * Event handler for when a user sends a message
+   * Sends a message to the currently selected channel
+   * @param event the event for when a user submits a message
+   */
   const sendMessage = (event: React.FormEvent) => {
     event.preventDefault()
     if (isConnected) {
@@ -120,6 +124,7 @@ export default function Chat({ user, previousMessages, channels }: { user: User,
    * @param event MouseEvent because the ChannelBar consists of li elements
    */
   const selectChannel = (channel_id: number, event: React.MouseEvent<HTMLLIElement>) => {
+    // TODO: get rid of console.log
     console.log(event)
     setCurrentChannel(channel_id)
   }
@@ -144,29 +149,6 @@ export default function Chat({ user, previousMessages, channels }: { user: User,
     onClick: selectChannel
   }
 
-const fetchChannelUsers = async (channelID: number) => {
-    const api = process.env.NEXT_PUBLIC_BACKEND_API!;
-    const apiHeaders = {
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-    };
-    try {
-      const response = await fetch(`${api}/channels/${channelID}/users`, apiHeaders);
-      if (response.ok) {
-        const users = await response.json();
-        const usersWithStatus = users.map((user: ChannelUser) => ({...user, status: 'online'}));
-        setChannelUsers(usersWithStatus);
-      } else {
-        console.error('Failed to fetch users:', response.statusText);
-      }
-    } catch (error) {
-      console.error('Error with users', error);
-    }
-};
-
-
   return (
     <div className={styles.container}>
       <ChannelBar channels={channels} handler={channelHandler} />
@@ -174,7 +156,7 @@ const fetchChannelUsers = async (channelID: number) => {
         <PreviousMessages messages={msgHistory} />
         <ChatInput handlers={inputHandlers} />
       </div>
-      <UserList users={channelUsers}/>
+      <UserList users={userList}/>
     </div>
   )
 }
