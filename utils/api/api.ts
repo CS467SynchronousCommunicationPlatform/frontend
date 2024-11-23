@@ -77,4 +77,28 @@ export async function fetchChannelUsers(channels: Channel[]) {
           }
     }
     return channelsAndUsers
-};
+}
+
+
+/**
+ * Update the display name of a user.
+ * @param userId The ID of the user to update.
+ * @param displayName The new display name.
+ * @returns The updated user data or an error message.
+ */
+export async function updateUserDisplayName(userId: string, displayName: string) {
+    const response = await fetch(`/users/${userId}`, {
+        method: 'PUT',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ displayName }),
+    });
+
+    if (response.ok) {
+        return await response.json();
+    } else {
+        const errorData = await response.json();
+        throw new Error(errorData.message || 'Failed to update display name');
+    }
+}
