@@ -1,3 +1,5 @@
+"use client";
+
 import React from 'react';
 import { AiOutlineHome, AiOutlineSetting } from 'react-icons/ai'; // Icons for home and admin
 import styles from '@/app/ChatPage.module.css'
