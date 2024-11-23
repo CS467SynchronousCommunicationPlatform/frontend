@@ -4,8 +4,8 @@ import Chat from "@/components/Chat";
 import { createClient } from '@/utils/supabase/server'
 import { redirect } from 'next/navigation'
 import { Channel } from '@/utils/types/types'
-import {NavBar} from "@/components/NavBar";
-import { 
+import NavBar from "@/components/NavBar";
+import {
   fetchAllChannelsForCurrentUser, 
   fetchAllPreviousMessages,
   fetchChannelUsers 
