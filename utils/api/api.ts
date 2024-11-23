@@ -87,7 +87,7 @@ export async function fetchChannelUsers(channels: Channel[]) {
  * @returns The updated user data or an error message.
  */
 export async function updateUserDisplayName(userId: string, displayName: string) {
-    const response = await fetch(`/users/${userId}`, {
+    const response = await fetch(`${api}/users/${userId}`, {
         method: 'PUT',
         headers: {
             'Content-Type': 'application/json',
