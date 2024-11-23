@@ -69,6 +69,7 @@ export async function fetchChannelUsers(channels: Channel[]) {
             const response = await fetch(`${api}/channels/${channel.id}/users`, apiHeaders);
             if (response.ok) {
               const users = await response.json();
+              console.log(response)
               const usersWithStatus: ChannelUser[] = users.map((user: ChannelUser) => ({...user, status: 'online'}));
               channelsAndUsers.set(channel.id, usersWithStatus)
             }
