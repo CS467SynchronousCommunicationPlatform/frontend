@@ -1,7 +1,7 @@
 import React from 'react';
 import { createClient } from '@/utils/supabase/server';
 import { redirect } from 'next/navigation';
-import { NavBar } from "@/components/NavBar";
+import NavBar  from "@/components/NavBar";
 import AdminPanelComponent from "@/components/AdminPanel"; // Ensure AdminPanelComponent is a proper component
 
 /**
