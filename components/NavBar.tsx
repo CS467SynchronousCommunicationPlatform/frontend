@@ -20,7 +20,7 @@ const NavBar = () => {
                 <li
                     className={`${styles.navItem} ${pathname === '/AdminPanel' ? styles.active : ''}`}
                 >
-                    <NavItem href="/admin"><AiOutlineSetting size={24} /></NavItem>
+                    <NavItem href="/AdminPanel"><AiOutlineSetting size={24} /></NavItem>
                 </li>
             </ul>
         </nav>
