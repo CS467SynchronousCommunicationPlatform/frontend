@@ -1,61 +1,29 @@
-// file: app/admin-panel/page.tsx
-"use client";
+import React from 'react';
+import { createClient } from '@/utils/supabase/server';
+import { redirect } from 'next/navigation';
+import { NavBar } from "@/components/NavBar";
+import AdminPanelComponent from "@/components/AdminPanel"; // Ensure AdminPanelComponent is a proper component
 
-import React, { useState } from 'react';
-import { updateUserDisplayName } from '@/utils/api/api';
-import { type User } from '@supabase/supabase-js';
+/**
+ * The entry point to our Admin Panel.
+ * Handles authentication and data fetching.
+ * @returns AdminPanel component
+ */
+export default async function AdminPanelPage() {
+    // Initialize Supabase
+    const supabase = await createClient();
 
-const AdminPanel: React.FC<{ user: User }> = ({ user }) => {
-    const [displayName, setDisplayName] = useState('');
-    const [errorMessage, setErrorMessage] = useState('');
+    // Check if user is authenticated
+    const { data: { user } } = await supabase.auth.getUser();
 
-    const handleSubmit = async (event: React.FormEvent) => {
-        event.preventDefault();
-
-        // Alphanumeric validation
-        const alphanumericRegex = /^[a-zA-Z0-9 ]*$/;
-        if (!alphanumericRegex.test(displayName)) {
-            setErrorMessage('Display name can only contain letters, numbers, and spaces.');
-            return;
-        }
-
-        setErrorMessage('');
-
-        try {
-            const data = await updateUserDisplayName(user.id, displayName);
-
-            if (data) {
-                console.log('Display name updated:', data);
-            } else {
-                setErrorMessage('Failed to update display name');
-            }
-
-        } catch (error) {
-            setErrorMessage('An error occurred while updating the display name');
-            console.error('Error:', error);
-        }
-    };
+    if (!user) {
+        return redirect('/login');
+    }
 
     return (
         <div>
-            <h1>Admin Panel</h1>
-            <p>Welcome to the admin panel</p>
-            <form onSubmit={handleSubmit}>
-                <label>
-                    Display Name:
-                    <input
-                        type="text"
-                        value={displayName}
-                        onChange={(e) => setDisplayName(e.target.value)}
-                        required
-                    />
-                </label>
-                <br />
-                <button type="submit">Submit</button>
-                {errorMessage && <p style={{color: 'red'}}>{errorMessage}</p>}
-            </form>
+            {user && <NavBar />}
+            <AdminPanelComponent user={user} />
         </div>
     );
-};
-
-export default AdminPanel;
+}
