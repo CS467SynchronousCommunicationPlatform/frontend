@@ -1,6 +1,6 @@
 import React from 'react';
 import Chat from "@/components/Chat";
-import AdminPanel from "@/app/AdminPanel/page";
+
 import { createClient } from '@/utils/supabase/server'
 import { redirect } from 'next/navigation'
 import { Channel } from '@/utils/types/types'
