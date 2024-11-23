@@ -1,8 +1,10 @@
 import React from 'react';
 import Chat from "@/components/Chat";
+
 import { createClient } from '@/utils/supabase/server'
 import { redirect } from 'next/navigation'
 import { Channel } from '@/utils/types/types'
+import {NavBar} from "@/components/NavBar";
 import { 
   fetchAllChannelsForCurrentUser, 
   fetchAllPreviousMessages,
@@ -36,11 +38,14 @@ export default async function Page() {
   const channelUsers = await fetchChannelUsers(channels)
 
   return (
+      <div>
+        {user && <NavBar />}
     <Chat 
       user={user}
       previousMessages={previousMessages}
       channels={channels}
       channelUsers={channelUsers}
       />
+      </div>
   )
 }

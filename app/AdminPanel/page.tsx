@@ -1,14 +1,29 @@
-// app/admin-panel/page.tsx
 import React from 'react';
+import { createClient } from '@/utils/supabase/server';
+import { redirect } from 'next/navigation';
+import { NavBar } from "@/components/NavBar";
+import AdminPanelComponent from "@/components/AdminPanel"; // Ensure AdminPanelComponent is a proper component
 
-const AdminPanel: React.FC = () => {
+/**
+ * The entry point to our Admin Panel.
+ * Handles authentication and data fetching.
+ * @returns AdminPanel component
+ */
+export default async function AdminPanelPage() {
+    // Initialize Supabase
+    const supabase = await createClient();
+
+    // Check if user is authenticated
+    const { data: { user } } = await supabase.auth.getUser();
+
+    if (!user) {
+        return redirect('/login');
+    }
+
     return (
         <div>
-            <h1>Admin Panel</h1>
-            <p>Welcome to the admin panel</p>
-            {/* Add more content or components specific to the admin panel here */}
+            {user && <NavBar />}
+            <AdminPanelComponent user={user} />
         </div>
     );
-};
-
-export default AdminPanel;
+}
