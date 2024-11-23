@@ -46,7 +46,6 @@ export default async function Page() {
       channels={channels}
       channelUsers={channelUsers}
       />
-    <AdminPanel user={user} />
       </div>
   )
 }
