@@ -5,6 +5,7 @@ import { createClient } from '@/utils/supabase/server'
 import { redirect } from 'next/navigation'
 import { Channel } from '@/utils/types/types'
 import NavBar from "@/components/NavBar";
+import styles from '@/app/ChatPage.module.css'
 import {
   fetchAllChannelsForCurrentUser, 
   fetchAllPreviousMessages,
@@ -38,7 +39,7 @@ export default async function Page() {
   const channelUsers = await fetchChannelUsers(channels)
 
   return (
-      <div>
+      <div className={styles.container}>
         {user && <NavBar />}
     <Chat 
       user={user}

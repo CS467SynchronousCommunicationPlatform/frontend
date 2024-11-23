@@ -7,25 +7,26 @@
     color: #fff;
 }
 
-.sidebarLeft {
+.sidebarLeft, .sidebarRight {
     width: 200px;
     background-color: #202225;
     padding: 20px;
     display: flex;
     flex-direction: column;
+    overflow-y: auto;
 }
 
-.sidebarLeft h3 {
+.sidebarLeft h3, .sidebarRight h3 {
     margin-bottom: 20px;
     color: #b9bbbe;
 }
 
-.sidebarLeft ul {
+.sidebarLeft ul, .userStatus ul {
     list-style: none;
     padding: 0;
 }
 
-.sidebarLeft li {
+.sidebarLeft li, .userStatus li {
     margin-bottom: 10px;
     cursor: pointer;
 }
@@ -46,7 +47,7 @@
 .chatSection {
     flex: 1;
     display: flex;
-    flex-direction: column;    
+    flex-direction: column;
 }
 
 .chatHeader {
@@ -76,6 +77,14 @@
     margin-left: 10px;
 }
 
+.chatInputContainer {
+    padding: 10px;
+    background-color: #40444b;
+    border-top: 1px solid #202225;
+    display: flex;
+    align-items: center;
+}
+
 .messageInput {
     padding: 5px;
     background-color: #40444b;
@@ -86,52 +95,12 @@
     margin-right: 10px;
 }
 
-.chatInputContainer {
-    padding: 10px;
-    background-color: #40444b;
-    border-top: 1px solid #202225;
-}
-
 .chatInputContainer button {
     background-color: #526fda;
     color: white;
     border: none;
     padding: 10px;
     cursor: pointer;
-}
-
-.chatForm {
-    display: flex;
-}
-
-.sidebarRight {
-    width: 200px;
-    background-color: #202225;
-    padding: 20px;
-}
-
-.sidebarRight h3 {
-    margin-bottom: 20px;
-    color: #b9bbbe;
-}
-
-.userStatus {
-    margin-bottom: 20px;
-}
-
-.userStatus p {
-    font-weight: bold;
-    color: #b9bbbe;
-}
-
-.userStatus ul {
-    list-style: none;
-    padding: 0;
-}
-
-.userStatus li {
-    margin-bottom: 10px;
-    color: white;
 }
 
 /*NAVBAR*/
