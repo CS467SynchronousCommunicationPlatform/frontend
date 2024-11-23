@@ -1,6 +1,6 @@
 import React from 'react';
 import { AiOutlineHome, AiOutlineSetting } from 'react-icons/ai'; // Icons for home and admin
-import styles from './ChatPage.module.css'; // Assuming CSS module for styling
+import styles from '@/app/ChatPage.module.css'
 
 const NavBar = () => {
     return (
