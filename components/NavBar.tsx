@@ -18,7 +18,7 @@ const NavBar = () => {
                     <NavItem href="/"><AiOutlineHome size={24} /></NavItem>
                 </li>
                 <li
-                    className={`${styles.navItem} ${pathname === '/admin' ? styles.active : ''}`}
+                    className={`${styles.navItem} ${pathname === '/AdminPanel' ? styles.active : ''}`}
                 >
                     <NavItem href="/admin"><AiOutlineSetting size={24} /></NavItem>
                 </li>
