@@ -5,6 +5,8 @@ import { createClient } from '@/utils/supabase/server'
 import { redirect } from 'next/navigation'
 import { Channel } from '@/utils/types/types'
 import NavBar from "@/components/NavBar";
+import {Sidebar} from "@/components/Catalyst/sidebar";
+import {StackedLayout} from "@/components/Catalyst/stacked-layout";
 import {
   fetchAllChannelsForCurrentUser, 
   fetchAllPreviousMessages,
@@ -38,14 +40,16 @@ export default async function Page() {
   const channelUsers = await fetchChannelUsers(channels)
 
   return (
-      <div>
-        {user && <NavBar />}
-    <Chat 
-      user={user}
-      previousMessages={previousMessages}
-      channels={channels}
-      channelUsers={channelUsers}
-      />
-      </div>
+      <StackedLayout
+          navbar={<NavBar/>}
+          sidebar={<Sidebar />}
+          >
+        <Chat
+            user={user}
+            previousMessages={previousMessages}
+            channels={channels}
+            channelUsers={channelUsers}
+        />
+      </StackedLayout>
   )
 }

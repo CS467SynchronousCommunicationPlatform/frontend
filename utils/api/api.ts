@@ -103,3 +103,94 @@ export async function updateUserDisplayName(userId: string, displayName: string)
         throw new Error(errorData.message || 'Failed to update display name');
     }
 }
+
+/**
+ * Fetch all users
+ * This function hits the /users endpoint and returns all users as a JSON object.
+ * @returns an array of users
+ */
+export async function fetchAllUsers() {
+    try {
+        const response = await fetch(`${api}/users`, apiHeaders);
+        if (response.ok) {
+            const users: User[] = await response.json();
+            return users;
+        } else {
+            console.error('Failed to fetch users:', response.statusText);
+        }
+    } catch (error) {
+        console.error('Error fetching users:', error);
+    }
+    return [];
+}
+
+/**
+ * Create a new channel
+ * This function hits the /channels endpoint and creates a new channel with the given name, description, and privacy.
+ * @param name The name of the channel
+ * @param description The description of the channel
+ * @param isPrivate Boolean indicating if the channel is private
+ * @returns The newly created channel data or an error message
+ */
+export async function createNewChannel(name: string, description: string, isPrivate: boolean) {
+    const requestBody = {
+        name,
+        description,
+        private: isPrivate,
+    };
+
+    try {
+        const response = await fetch(`${api}/channels`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(requestBody),
+        });
+
+        if (response.ok) {
+            const channel = await response.json();
+            return channel;
+        } else {
+            const errorData = await response.json();
+            throw new Error(errorData.message || 'Failed to create channel');
+        }
+    } catch (error) {
+        console.error('Error creating channel:', error);
+        throw error;
+    }
+}
+
+/**
+ * Add a user to a specified channel
+ * This function hits the /channels/:channelId/users endpoint to add a user to a channel.
+ * @param channelId The ID of the channel
+ * @param userId The ID of the user to be added
+ * @returns A success message or an error message
+ */
+export async function addUserToChannel(channelId: number, userId: string) {
+    const requestBody = {
+        userId,
+    };
+
+    try {
+        const response = await fetch(`${api}/channels/${channelId}/users`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(requestBody),
+        });
+
+        if (response.ok) {
+            const result = await response.json();
+            return result;
+        } else {
+            const errorData = await response.json();
+            throw new Error(errorData.message || 'Failed to add user to channel');
+        }
+    } catch (error) {
+        console.error('Error adding user to channel:', error);
+        throw error;
+    }
+}

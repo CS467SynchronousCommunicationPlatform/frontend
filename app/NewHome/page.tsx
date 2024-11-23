@@ -3,8 +3,13 @@ import { createClient } from '@/utils/supabase/server';
 import { redirect } from 'next/navigation';
 import NavBar  from "@/components/NavBar";
 import {StackedLayout} from "@/components/Catalyst/stacked-layout";
-import AdminPanelComponent from "@/components/AdminPanel";
-import {Sidebar} from "@/components/Catalyst/sidebar"; // Ensure AdminPanelComponent is a proper component
+import { Channel } from '@/utils/types/types'
+import {Sidebar} from "@/components/Catalyst/sidebar";
+import {
+    fetchAllChannelsForCurrentUser,
+    fetchAllPreviousMessages,
+    fetchChannelUsers
+} from '@/utils/api/api';// Ensure AdminPanelComponent is a proper component
 
 /**
  * The entry point to our Admin Panel.
@@ -22,12 +27,15 @@ export default async function AdminPanelPage() {
         return redirect('/login');
     }
 
+    // CHANNEL BAR HELP
+    // fetch all channels the user is subscribed to
+    const channels: Channel[] = await fetchAllChannelsForCurrentUser(user)
+
     return (
         <StackedLayout
             navbar={<NavBar />}
             sidebar={<Sidebar />}
         >
-            <AdminPanelComponent user={user} />
         </StackedLayout>
     );
 }
