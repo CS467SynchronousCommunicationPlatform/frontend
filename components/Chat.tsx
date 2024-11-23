@@ -150,13 +150,13 @@ export default function Chat({ user, previousMessages, channels, channelUsers }:
   }
 
   return (
-    <div className={styles.chatSection}>
+    <div className={styles.container}>
       <ChannelBar channels={channels} handler={channelHandler} />
-      <div className={styles.chatWindow}>
+      <div className={styles.chatSection}>
         <PreviousMessages messages={msgHistory} />
-        <div className={styles.chatInputContainer}>
+
         <ChatInput handlers={inputHandlers} />
-        </div>
+
       </div>
       <UserList users={userList}/>
     </div>
