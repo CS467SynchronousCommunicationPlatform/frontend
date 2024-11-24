@@ -11,12 +11,16 @@ import { Field, Label } from '@/app/ui/Catalyst/fieldset'
 import { Input } from '@/app/ui/Catalyst/input'
 import { Checkbox, CheckboxField, CheckboxGroup } from '@/app/ui/Catalyst/checkbox'
 import {createNewChannel} from "@/app/lib/api/api";
+import { useAppState } from '@/app/lib/contexts/AppContext';
 
 
 
 
 
-export default function ChannelBar({ channels, handler, userid, onChannelCreate }: { channels: Channel[], handler: ChannelHandler, userid: string, onChannelCreate: (newChannel: Channel) => void; }) {
+export default function ChannelBar() {
+    const { state, dispatch } = useAppState();
+    const { channels, currentChannel, user } = state;
+
     let [isOpen, setIsOpen] = useState(false)
     const [name, setName] = useState('')
     const [description, setDescription] = useState('')
@@ -38,15 +42,15 @@ export default function ChannelBar({ channels, handler, userid, onChannelCreate 
         console.log(description)
 
         try {
-            const response = await createNewChannel(name.trim(), description, isPrivate, userid);
+            const response = await createNewChannel(name.trim(), description, isPrivate, user.id);
             const newChannel = {
                 id: response.id,
                 name: name.trim(),
                 description,
                 private: isPrivate === 'True',
             };
+            dispatch({ type: 'SET_CHANNELS', payload: [...channels, newChannel] });
             alert("Channel created successfully!");
-            onChannelCreate(newChannel);
             // Optionally, update UI with new channel details
             setIsOpen(false); // Close the dialog
 
@@ -54,6 +58,10 @@ export default function ChannelBar({ channels, handler, userid, onChannelCreate 
             console.error("Error creating channel:", err);
             alert("Failed to create channel. Please try again.");
         }
+    };
+
+    const handleChannelSelect = (channelId: number) => {
+        dispatch({ type: 'SET_CURRENT_CHANNEL', payload: channelId });
     };
 
     // Group channels by public and private
@@ -68,11 +76,11 @@ export default function ChannelBar({ channels, handler, userid, onChannelCreate 
             <div>
                 <h4 className="text-xs font-bold text-gray-500 uppercase mb-2">Public Channels</h4>
                 <ul>
-                    {publicChannels.map((channel, index) => (
+                    {publicChannels.map((channel) => (
                         <li
-                            key={index}
-                            className="cursor-pointer p-2 rounded hover:bg-gray-700 hover:text-white transition"
-                            onClick={(event) => handler.onClick(channel.id, event)}
+                            key={channel.id}
+                            className={`cursor-pointer p-2 rounded transition ${currentChannel === channel.id ? 'bg-gray-700 text-white' : 'hover:bg-gray-700 hover:text-white'}`}
+                            onClick={() => handleChannelSelect(channel.id)}
                         >
                             # {channel.name}
                         </li>
@@ -86,9 +94,9 @@ export default function ChannelBar({ channels, handler, userid, onChannelCreate 
                 <ul>
                     {privateChannels.map((channel, index) => (
                         <li
-                            key={index}
-                            className="cursor-pointer p-2 rounded hover:bg-gray-700 hover:text-white transition"
-                            onClick={(event) => handler.onClick(channel.id, event)}
+                            key={channel.id}
+                            className={`cursor-pointer p-2 rounded transition ${currentChannel === channel.id ? 'bg-gray-700 text-white' : 'hover:bg-gray-700 hover:text-white'}`}
+                            onClick={() => handleChannelSelect(channel.id)}
                         >
                             # {channel.name}
                         </li>
