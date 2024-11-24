@@ -38,21 +38,6 @@ export default function Master() {
     const [msgBody, setMsgBody] = useState<string>('')
     const [isConnected, setIsConnected] = useState(socket.connected)
 
-
-    // Callback to add a new channel
-    const addChannel = async (newChannel: Channel) => {
-
-        try {
-            const newMessages = await fetchAllPreviousMessages(channels);
-            const newUserList = await fetchChannelUsers(channels);
-            dispatch({ type: 'SET_CHANNELS', payload: [...channels, newChannel] });
-            dispatch({ type: 'SET_MESSAGES', payload: newMessages });
-            dispatch({ type: 'SET_CHANNEL_USERS', payload: newUserList });
-        } catch (error) {
-            console.error("Failed to fetch data for new channel:", error);
-        }
-    };
-
     // On page load, connect to the socket
     useEffect(() => {
         updateSocketAuth(user.id)
@@ -161,7 +146,7 @@ export default function Master() {
         <div className="flex h-full">
             {/* ChannelBar */}
             <div className="w-1/5 bg-gray-900 max-sm:hidden" >
-                <ChannelBar channels={channels} handler={channelHandler} userid={user.id} onChannelCreate={addChannel}/>
+                <ChannelBar />
             </div>
 
             {/* Main Chat Area */}
@@ -176,7 +161,7 @@ export default function Master() {
 
             {/* UserList */}
             <div className="w-1/5 bg-gray-900 max-sm:hidden">
-                <UserList users={channelUsers.get(currentChannel) || []}/>
+                <UserList />
             </div>
         </div>
     );

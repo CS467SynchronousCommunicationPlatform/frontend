@@ -2,15 +2,19 @@
 
 
 import { signout } from '@/app/login/actions';
-import { Channel, ChannelHandler } from '@/app/lib/types/types'
 import { Button } from "@/app/ui/Catalyst/button";
 import { PlusIcon} from "@heroicons/react/16/solid";
 import { Dialog, DialogActions, DialogBody, DialogDescription, DialogTitle } from '@/app/ui/Catalyst/dialog'
-import {useState} from "react";
+import {useState, useEffect} from "react";
 import { Field, Label } from '@/app/ui/Catalyst/fieldset'
 import { Input } from '@/app/ui/Catalyst/input'
 import { Checkbox, CheckboxField, CheckboxGroup } from '@/app/ui/Catalyst/checkbox'
-import {createNewChannel} from "@/app/lib/api/api";
+import {
+    fetchAllChannelsForCurrentUser,
+    fetchAllPreviousMessages,
+    fetchChannelUsers,
+    createNewChannel
+} from "@/app/lib/api/api";
 import { useAppState } from '@/app/lib/contexts/AppContext';
 
 
@@ -25,6 +29,8 @@ export default function ChannelBar() {
     const [name, setName] = useState('')
     const [description, setDescription] = useState('')
     const [isPrivate, setIsPrivate] = useState('True')
+    // A new state to trigger effect for fetching data
+    const [shouldFetchData, setShouldFetchData] = useState(false);
 
     let togglePrivate = () => {
         console.log(isPrivate)
@@ -51,6 +57,8 @@ export default function ChannelBar() {
             };
             dispatch({ type: 'SET_CHANNELS', payload: [...channels, newChannel] });
             alert("Channel created successfully!");
+            // Set shouldFetchData to true to trigger useEffect
+            setShouldFetchData(true);
             // Optionally, update UI with new channel details
             setIsOpen(false); // Close the dialog
 
@@ -59,6 +67,27 @@ export default function ChannelBar() {
             alert("Failed to create channel. Please try again.");
         }
     };
+
+    useEffect(() => {
+        if (shouldFetchData) {
+            const fetchData = async () => {
+                try {
+                    const [updatedChannels, newMessages, newUserList] = await Promise.all([
+                        fetchAllChannelsForCurrentUser(user),
+                        fetchAllPreviousMessages(channels),
+                        fetchChannelUsers(channels),
+                    ]);
+                    dispatch({ type: 'SET_CHANNELS', payload: updatedChannels });
+                    dispatch({ type: 'SET_MESSAGES', payload: newMessages });
+                    dispatch({ type: 'SET_CHANNEL_USERS', payload: newUserList });
+                } catch (error) {
+                    console.error("Failed to fetch updated data:", error);
+                }
+            };
+            fetchData();
+            setShouldFetchData(false); // Reset shouldFetchData flag
+        }
+    }, [shouldFetchData, user, channels, dispatch]);
 
     const handleChannelSelect = (channelId: number) => {
         dispatch({ type: 'SET_CURRENT_CHANNEL', payload: channelId });
