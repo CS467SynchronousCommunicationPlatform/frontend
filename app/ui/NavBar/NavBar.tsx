@@ -17,7 +17,7 @@ const NavBar = () => {
     };
 
     return (
-        <header className="bg-gray-800 text-white border-b border-gray-700">
+        <header className="bg-gray-800 text-white border-b border-gray-700 fixed w-full top-0 z-20">
             <div className="max-w-7xl mx-auto px-2 sm:px-6 lg:px-8">
                 <div className="relative flex items-center justify-between h-16">
                     {/* Mobile view left side Moon Icon */}
