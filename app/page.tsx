@@ -1,7 +1,7 @@
 import React from 'react';
 import { createClient } from '@/app/lib/supabase/server';
 import { redirect } from 'next/navigation';
-import NavBar  from "@/app/ui/components/NavBar";
+import NavBar  from "@/app/ui/NavBar/NavBar";
 import {StackedLayout} from "@/app/ui/Catalyst/stacked-layout";
 import { Channel } from '@/app/lib/types/types'
 import {Sidebar} from "@/app/ui/Catalyst/sidebar";
@@ -10,7 +10,7 @@ import {
     fetchAllPreviousMessages,
     fetchChannelUsers
 } from '@/app/lib/api/api';
-import Master from "@/app/ui/components/Master";
+import Master from "@/app/ui/Master/Master";
 // Ensure AdminPanelComponent is a proper component
 
 /**
@@ -18,7 +18,7 @@ import Master from "@/app/ui/components/Master";
  * Handles authentication and data fetching.
  * @returns AdminPanel component
  */
-export default async function AdminPanelPage() {
+export default async function HomePage() {
     // Initialize Supabase
     const supabase = await createClient();
 
