@@ -3,6 +3,9 @@
 import React, { useState } from 'react';
 import { updateUserDisplayName } from '@/utils/api/api';
 import { User } from '@supabase/supabase-js';
+import {Heading} from "@/components/Catalyst/heading";
+import {Divider} from "@/components/Catalyst/divider";
+import {Text} from "@/components/Catalyst/text";
 
 interface AdminPanelProps {
     user: User;
@@ -38,11 +41,13 @@ const AdminPanelComponent: React.FC<AdminPanelProps> = ({ user }) => {
             console.error('Error:', error);
         }
     };
+    console.log(user)
 
     return (
         <div>
-            <h1>Admin Panel</h1>
-            <p>Welcome to the admin panel, {user.user_metadata.full_name}</p>
+            <Heading>Admin Panel</Heading>
+            <Divider className={'my-6'}></Divider>
+            <Text>Welcome to the admin panel, {user.user_metadata.display_}</Text>
             <form onSubmit={handleSubmit}>
                 <label>
                     Display Name:
