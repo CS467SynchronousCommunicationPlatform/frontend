@@ -17,6 +17,11 @@ import PreviousMessages from '@/components/PreviousMessages'
 import UserList from '@/components/UserList'
 import ChannelBar from '@/components/ChannelBar';
 import { EmojiClickData } from 'emoji-picker-react'
+import {
+    fetchAllChannelsForCurrentUser,
+    fetchAllPreviousMessages,
+    fetchChannelUsers
+} from '@/utils/api/api';
 
 
 /**
@@ -30,6 +35,7 @@ import { EmojiClickData } from 'emoji-picker-react'
  */
 export default function Master({ user, previousMessages, channels, channelUsers }: { user: User, previousMessages: Map<number, MessageProps[]>, channels: Channel[], channelUsers: Map<number, ChannelUser[]> }) {
     const [msgBody, setMsgBody] = useState<string>('')
+    const [channelList, setChannelList] = useState<Channel[]>(channels)
     const [currentChannel, setCurrentChannel] = useState<number>(4)
     // define a state variable for all messages, avoid mutating previousMessages since its a prop
     const [allMessages, setAllMessages] = useState<Map<number, MessageProps[]>>(new Map(previousMessages))
@@ -38,6 +44,20 @@ export default function Master({ user, previousMessages, channels, channelUsers 
     const [isConnected, setIsConnected] = useState(socket.connected)
     // user list logic, set to general at first
     const [userList, setUserList] = useState<ChannelUser[]>(channelUsers.get(4) || [])
+
+    // Callback to add a new channel
+    const addChannel = async (newChannel: Channel) => {
+        setChannelList((prev) => [...prev, newChannel]);
+        // Fetch messages and users for the new channel
+        try {
+            const newMessages = await fetchAllPreviousMessages(channelList);
+            const newUserList = await fetchChannelUsers(channelList);
+            setAllMessages((prev) => new Map(newMessages));
+            setUserList(newUserList.get(newChannel.id) || []);
+        } catch (error) {
+            console.error("Failed to fetch data for new channel:", error);
+        }
+    };
 
     // On page load, connect to the socket
     useEffect(() => {
@@ -152,7 +172,7 @@ export default function Master({ user, previousMessages, channels, channelUsers 
         <div className="flex h-full">
             {/* ChannelBar */}
             <div className="w-1/5 bg-gray-900 max-sm:hidden" >
-                <ChannelBar channels={channels} handler={channelHandler}/>
+                <ChannelBar channels={channelList} handler={channelHandler} userid={user.id} onChannelCreate={addChannel}/>
             </div>
 
             {/* Main Chat Area */}

@@ -30,6 +30,7 @@ export interface Channel {
     name: string;
     description: string;
     id: number;
+    private: boolean;
 }
 
 /**
