@@ -115,7 +115,7 @@ export default function Master() {
 
 
     return (
-        <div className="flex h-full">
+        <div className="flex h-full pt-16">
             {/* ChannelBar */}
             <div
                 ref={channelBarRef}
