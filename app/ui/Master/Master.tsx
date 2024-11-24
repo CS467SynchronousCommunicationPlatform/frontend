@@ -17,6 +17,7 @@ import PreviousMessages from '@/app/ui/Chat/PreviousMessages'
 import UserList from '@/app/ui/Users/UserList'
 import ChannelBar from '@/app/ui/Channels/ChannelBar';
 import { EmojiClickData } from 'emoji-picker-react'
+import { useAppState } from '@/app/lib/contexts/AppContext';
 import {
     fetchAllChannelsForCurrentUser,
     fetchAllPreviousMessages,
@@ -33,27 +34,23 @@ import {
  * @param channels: the channels the user is subscribed to
  * @returns
  */
-export default function Master({ user, previousMessages, channels, channelUsers }: { user: User, previousMessages: Map<number, MessageProps[]>, channels: Channel[], channelUsers: Map<number, ChannelUser[]> }) {
+export default function Master() {
+    const {state, dispatch} = useAppState();
+    const { user, channels, currentChannel, allMessages, channelUsers } = state;
+
     const [msgBody, setMsgBody] = useState<string>('')
-    const [channelList, setChannelList] = useState<Channel[]>(channels)
-    const [currentChannel, setCurrentChannel] = useState<number>(4)
-    // define a state variable for all messages, avoid mutating previousMessages since its a prop
-    const [allMessages, setAllMessages] = useState<Map<number, MessageProps[]>>(new Map(previousMessages))
-    // set the msgHistory to general at first. If undefined set it to an empty array (ts error)
-    const [msgHistory, setMsgHistory] = useState<MessageProps[]>(previousMessages.get(4) || [])
     const [isConnected, setIsConnected] = useState(socket.connected)
-    // user list logic, set to general at first
-    const [userList, setUserList] = useState<ChannelUser[]>(channelUsers.get(4) || [])
+
 
     // Callback to add a new channel
     const addChannel = async (newChannel: Channel) => {
-        setChannelList((prev) => [...prev, newChannel]);
-        // Fetch messages and users for the new channel
+
         try {
-            const newMessages = await fetchAllPreviousMessages(channelList);
-            const newUserList = await fetchChannelUsers(channelList);
-            setAllMessages((prev) => new Map(newMessages));
-            setUserList(newUserList.get(newChannel.id) || []);
+            const newMessages = await fetchAllPreviousMessages(channels);
+            const newUserList = await fetchChannelUsers(channels);
+            dispatch({ type: 'SET_CHANNELS', payload: [...channels, newChannel] });
+            dispatch({ type: 'SET_MESSAGES', payload: newMessages });
+            dispatch({ type: 'SET_CHANNEL_USERS', payload: newUserList });
         } catch (error) {
             console.error("Failed to fetch data for new channel:", error);
         }
@@ -70,12 +67,6 @@ export default function Master({ user, previousMessages, channels, channelUsers 
             socket.disconnect()
         }
     }, [user.id])
-
-    // Update msgHistory and userList when currentChannel or allMessages changes
-    useEffect(() => {
-        setMsgHistory(allMessages.get(currentChannel) || [])
-        setUserList(channelUsers.get(currentChannel) || [])
-    }, [currentChannel, allMessages, channelUsers])
 
     // Socket event handlers
     useEffect(() => {
@@ -98,13 +89,14 @@ export default function Master({ user, previousMessages, channels, channelUsers 
 
         // Listens for incoming messages, adds the incoming message to message history
         const onIncomingMessage = (message: MessageProps) => {
-            setAllMessages((prevAllMessages) => {
-                const newAllMessages = new Map(prevAllMessages)
-                const channelMessages = prevAllMessages.get(message.channel_id) || []
-                newAllMessages.set(message.channel_id, [...channelMessages, message])
-                return newAllMessages
-            })
-        }
+            dispatch({
+                type: 'SET_MESSAGES',
+                payload: new Map(allMessages.set(message.channel_id, [
+                    ...(allMessages.get(message.channel_id) || []),
+                    message
+                ]))
+            });
+        };
 
         socket.on('connect', onConnect)
         socket.on('chat', onIncomingMessage)
@@ -116,7 +108,7 @@ export default function Master({ user, previousMessages, channels, channelUsers 
             socket.off('connect_error', onError)
             socket.off('chat', onIncomingMessage)
         }
-    }, [user.id, currentChannel])
+    }, [user.id, dispatch, allMessages])
 
     /**
      * Event handler for when a user sends a message
@@ -145,7 +137,7 @@ export default function Master({ user, previousMessages, channels, channelUsers 
     const selectChannel = (channel_id: number, event: React.MouseEvent<HTMLLIElement>) => {
         // TODO: get rid of console.log
         console.log(event)
-        setCurrentChannel(channel_id)
+        dispatch({ type: 'SET_CURRENT_CHANNEL', payload: channel_id });
     }
 
     const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -172,13 +164,13 @@ export default function Master({ user, previousMessages, channels, channelUsers 
         <div className="flex h-full">
             {/* ChannelBar */}
             <div className="w-1/5 bg-gray-900 max-sm:hidden" >
-                <ChannelBar channels={channelList} handler={channelHandler} userid={user.id} onChannelCreate={addChannel}/>
+                <ChannelBar channels={channels} handler={channelHandler} userid={user.id} onChannelCreate={addChannel}/>
             </div>
 
             {/* Main Chat Area */}
             <div className="flex flex-col flex-1 bg-gray-800">
                 <div className="flex-1 overflow-y-auto">
-                    <PreviousMessages messages={msgHistory}/>
+                    <PreviousMessages messages={allMessages.get(currentChannel) || []}/>
                 </div>
                 <div className="p-4">
                     <ChatInput handlers={inputHandlers}/>
@@ -187,7 +179,7 @@ export default function Master({ user, previousMessages, channels, channelUsers 
 
             {/* UserList */}
             <div className="w-1/5 bg-gray-900 max-sm:hidden">
-                <UserList users={userList}/>
+                <UserList users={channelUsers.get(currentChannel) || []}/>
             </div>
         </div>
     );

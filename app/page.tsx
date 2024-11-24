@@ -52,16 +52,13 @@ export default async function HomePage() {
     }
 
     return (
-        <StackedLayout
-            navbar={<NavBar />}
-            sidebar={<Sidebar />}
-        >
-            <Master
-                user={user}
-                previousMessages={previousMessages}
-                channels={channels}
-                channelUsers={channelUsers}
-            />
-        </StackedLayout>
+        <AppProvider initialState={initialState}>
+            <StackedLayout
+                navbar={<NavBar />}
+                sidebar={<Sidebar />}
+            >
+                <Master />
+            </StackedLayout>
+        </AppProvider>
     );
 }
