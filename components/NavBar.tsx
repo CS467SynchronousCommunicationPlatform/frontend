@@ -1,7 +1,7 @@
 "use client"; // Mark this as a client component
 
 import React from 'react';
-import { Navbar, NavbarItem, NavbarSection, NavbarSpacer } from '@/components/Catalyst/navbar'
+import { Navbar, NavbarItem, NavbarSection } from '@/components/Catalyst/navbar'
 
 const NavBar = () => {
 
@@ -11,7 +11,6 @@ const NavBar = () => {
             <NavbarSection>
                 <NavbarItem href="/">Home</NavbarItem>
                 <NavbarItem href="/AdminPanel">Settings</NavbarItem>
-                <NavbarItem href="/NewHome">NewHome</NavbarItem>
             </NavbarSection>
         </Navbar>
     );
