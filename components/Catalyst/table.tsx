@@ -55,7 +55,7 @@ export function TableRow({
   className,
   ...props
 }: { href?: string; target?: string; title?: string } & React.ComponentPropsWithoutRef<'tr'>) {
-  let { striped } = useContext(TableContext)
+  const { striped } = useContext(TableContext)
 
   return (
     <TableRowContext.Provider value={{ href, target, title } as React.ContextType<typeof TableRowContext>}>

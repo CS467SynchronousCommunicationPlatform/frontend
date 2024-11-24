@@ -38,8 +38,6 @@ export default function Master({ user, previousMessages, channels, channelUsers 
     const [isConnected, setIsConnected] = useState(socket.connected)
     // user list logic, set to general at first
     const [userList, setUserList] = useState<ChannelUser[]>(channelUsers.get(4) || [])
-    const [showChannelBar, setShowChannelBar] = useState(false);
-    const [showUserList, setShowUserList] = useState(false);
 
     // On page load, connect to the socket
     useEffect(() => {
