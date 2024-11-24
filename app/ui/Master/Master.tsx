@@ -10,18 +10,14 @@
 
 import { useEffect, useState } from 'react'
 import { socket, updateSocketAuth } from '@/socket'
-import { MessageProps, Channel, ChannelHandler, ChatInputProps, ChannelUser } from '@/app/lib/types/types'
+import { MessageProps,  ChatInputProps} from '@/app/lib/types/types'
 import ChatInput from '@/app/ui/Chat/ChatInput'
 import PreviousMessages from '@/app/ui/Chat/PreviousMessages'
 import UserList from '@/app/ui/Users/UserList'
 import ChannelBar from '@/app/ui/Channels/ChannelBar';
 import { EmojiClickData } from 'emoji-picker-react'
 import { useAppState } from '@/app/lib/contexts/AppContext';
-import {
-    fetchAllChannelsForCurrentUser,
-    fetchAllPreviousMessages,
-    fetchChannelUsers
-} from '@/app/lib/api/api';
+
 
 
 /**
@@ -33,13 +29,16 @@ import {
  */
 export default function Master() {
     const {state, dispatch} = useAppState();
-    const { user, channels, currentChannel, allMessages, channelUsers } = state;
+    const { user, currentChannel, allMessages } = state;
 
     const [msgBody, setMsgBody] = useState<string>('')
     const [isConnected, setIsConnected] = useState(socket.connected)
 
     // On page load, connect to the socket
+
+    // @ts-ignore
     useEffect(() => {
+        // @ts-ignore
         updateSocketAuth(user.id)
         socket.connect()
         console.log('[SOCKET] Client connected')
@@ -92,41 +91,6 @@ export default function Master() {
         }
     }, [user.id, dispatch, allMessages])
 
-    /**
-     * Event handler for when a user sends a message
-     * Sends a message to the currently selected channel
-     * @param event the event for when a user submits a message
-     */
-    const sendMessage = (event: React.FormEvent) => {
-        event.preventDefault()
-        if (isConnected) {
-            const message: MessageProps = {
-                user: user.id,
-                channel_id: currentChannel,
-                body: msgBody,
-                timestamp: new Date().toISOString()
-            }
-            socket.emit('chat', message)
-            setMsgBody('')
-        }
-    }
-
-    const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-        setMsgBody(event.target.value)
-    }
-
-    const handleEmojiClick = (emojiData: EmojiClickData, event: MouseEvent) => {
-        console.log(event)
-        setMsgBody((prevMsgBody) => prevMsgBody + emojiData.emoji)
-    }
-
-    const inputHandlers: ChatInputProps = {
-        submitHandler: sendMessage,
-        onChangeHandler: handleInputChange,
-        emojisHandler: handleEmojiClick,
-        value: msgBody,
-    }
-
 
     return (
         <div className="flex h-full">
@@ -138,10 +102,10 @@ export default function Master() {
             {/* Main Chat Area */}
             <div className="flex flex-col flex-1 bg-gray-800">
                 <div className="flex-1 overflow-y-auto">
-                    <PreviousMessages messages={allMessages.get(currentChannel) || []}/>
+                    <PreviousMessages />
                 </div>
                 <div className="p-4">
-                    <ChatInput handlers={inputHandlers}/>
+                    <ChatInput />
                 </div>
             </div>
 
