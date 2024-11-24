@@ -100,7 +100,7 @@ export default function ChannelBar() {
     const privateChannels = channels.filter((channel) => channel.private);
 
     return (
-        <div className="flex flex-col h-full overflow-y-auto bg-gray-900 text-gray-300 p-3">
+        <div className="flex flex-col h-full overflow-y-auto bg-gray-900 text-gray-300 p-3  mt-16 sm:mt-0">
             <h3 className="text-sm font-semibold text-gray-400 uppercase mb-4">Channels</h3>
 
             {/* Public Channels Section */}

@@ -117,6 +117,7 @@ export default function Master() {
     return (
         <div className="flex h-full pt-16">
             {/* ChannelBar */}
+
             <div
                 ref={channelBarRef}
                 className={`fixed inset-y-0 left-0 z-10 transform ${
