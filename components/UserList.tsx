@@ -1,5 +1,4 @@
 import React from 'react';
-import styles from '../app/ChatPage.module.css';
 import { ChannelUser } from '@/utils/types/types';
 
 const UserList: React.FC<{ users: ChannelUser[] }> = ({ users }) => {

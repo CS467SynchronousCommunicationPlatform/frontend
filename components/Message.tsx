@@ -2,7 +2,6 @@
  * Represents a message sent to a channel
  */
 import React from 'react';
-import styles from '@/app/ChatPage.module.css';
 import { MessageProps } from '@/utils/types/types'
 
 const Message: React.FC<MessageProps> = ({ user, body, timestamp }) => {

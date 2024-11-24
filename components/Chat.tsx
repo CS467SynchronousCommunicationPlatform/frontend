@@ -17,7 +17,6 @@ import PreviousMessages from '@/components/PreviousMessages'
 import UserList from '@/components/UserList'
 import ChannelBar from '@/components/ChannelBar';
 import { EmojiClickData } from 'emoji-picker-react'
-import styles from '@/app/ChatPage.module.css'
 
 
 /**

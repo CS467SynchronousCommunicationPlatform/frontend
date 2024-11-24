@@ -1,7 +1,6 @@
 "use client";
 
 
-import styles from '@/app/ChatPage.module.css';
 import { signout } from '@/app/login/actions';
 import { Channel, ChannelHandler } from '@/utils/types/types'
 import {Heading} from "@/components/Catalyst/heading";
