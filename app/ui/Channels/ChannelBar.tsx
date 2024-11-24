@@ -48,6 +48,7 @@ export default function ChannelBar() {
         console.log(description)
 
         try {
+            // @ts-ignore
             const response = await createNewChannel(name.trim(), description, isPrivate, user.id);
             const newChannel = {
                 id: response.id,
@@ -73,6 +74,7 @@ export default function ChannelBar() {
             const fetchData = async () => {
                 try {
                     const [updatedChannels, newMessages, newUserList] = await Promise.all([
+                        // @ts-ignore
                         fetchAllChannelsForCurrentUser(user),
                         fetchAllPreviousMessages(channels),
                         fetchChannelUsers(channels),

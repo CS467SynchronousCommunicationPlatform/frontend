@@ -36,7 +36,7 @@ export default function Master() {
 
     // On page load, connect to the socket
 
-    // @ts-ignore
+
     useEffect(() => {
         // @ts-ignore
         updateSocketAuth(user.id)
@@ -46,7 +46,7 @@ export default function Master() {
         return () => {
             // When the user logs out or closes the page, disconnect the socket
             socket.disconnect()
-        }
+        }// @ts-ignore
     }, [user.id])
 
     // Socket event handlers
@@ -60,6 +60,7 @@ export default function Master() {
             if (socket.active) {
                 // Temporary failure, not denied by the server
                 // update auth token and retry
+                // @ts-ignore
                 updateSocketAuth(user.id)
             } else {
                 // connection was denied by the server, disconnect the socket
@@ -88,7 +89,7 @@ export default function Master() {
             socket.off('connect', onConnect)
             socket.off('connect_error', onError)
             socket.off('chat', onIncomingMessage)
-        }
+        }// @ts-ignore
     }, [user.id, dispatch, allMessages])
 
 
