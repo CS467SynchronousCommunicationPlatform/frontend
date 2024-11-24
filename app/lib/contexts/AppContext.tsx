@@ -1,4 +1,4 @@
-'use client';
+"use client";
 
 import React, { createContext, useContext, useReducer, ReactNode } from 'react';
 import { Channel, MessageProps, ChannelUser } from '@/app/lib/types/types';
@@ -11,6 +11,8 @@ interface AppState {
     currentChannel: number;
     allMessages: Map<number, MessageProps[]>;
     channelUsers: Map<number, ChannelUser[]>;
+    isChannelBarVisible: boolean;
+    isUserListVisible: boolean;
 }
 
 // Define initial state
@@ -20,6 +22,8 @@ const initialState: AppState = {
     currentChannel: 4,
     allMessages: new Map(),
     channelUsers: new Map(),
+    isChannelBarVisible: false,
+    isUserListVisible: false,
 };
 
 // Create the context
@@ -44,6 +48,12 @@ const reducer = (state: AppState, action: any): AppState => {
             return { ...state, allMessages: new Map(action.payload) };
         case 'SET_CHANNEL_USERS':
             return { ...state, channelUsers: new Map(action.payload) };
+        case 'TOGGLE_CHANNEL_BAR':
+            return { ...state, isChannelBarVisible: !state.isChannelBarVisible };
+        case 'TOGGLE_USER_LIST':
+            return { ...state, isUserListVisible: !state.isUserListVisible };
+        case 'HIDE_BARS':
+            return { ...state, isChannelBarVisible: false, isUserListVisible: false };
         default:
             return state;
     }
