@@ -8,14 +8,13 @@
 
 "use client";
 
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useRef } from 'react'
 import { socket, updateSocketAuth } from '@/socket'
-import { MessageProps,  ChatInputProps} from '@/app/lib/types/types'
+import { MessageProps } from '@/app/lib/types/types'
 import ChatInput from '@/app/ui/Chat/ChatInput'
 import PreviousMessages from '@/app/ui/Chat/PreviousMessages'
 import UserList from '@/app/ui/Users/UserList'
 import ChannelBar from '@/app/ui/Channels/ChannelBar';
-import { EmojiClickData } from 'emoji-picker-react'
 import { useAppState } from '@/app/lib/contexts/AppContext';
 
 
@@ -29,10 +28,13 @@ import { useAppState } from '@/app/lib/contexts/AppContext';
  */
 export default function Master() {
     const {state, dispatch} = useAppState();
-    const { user, currentChannel, allMessages } = state;
+    const { user, currentChannel, allMessages, isChannelBarVisible, isUserListVisible } = state;
 
     const [msgBody, setMsgBody] = useState<string>('')
     const [isConnected, setIsConnected] = useState(socket.connected)
+
+    const channelBarRef = useRef<HTMLDivElement>(null);
+    const userListRef = useRef<HTMLDivElement>(null);
 
     // On page load, connect to the socket
 
@@ -92,11 +94,34 @@ export default function Master() {
         }// @ts-ignore
     }, [user.id, dispatch, allMessages])
 
+    const handleClickOutside = (event: MouseEvent) => {
+        if (
+            channelBarRef.current &&
+            !channelBarRef.current.contains(event.target as Node) &&
+            userListRef.current &&
+            !userListRef.current.contains(event.target as Node)
+        ) {
+            dispatch({ type: 'HIDE_BARS' });
+        }
+    };
+
+
+    useEffect(() => {
+        document.addEventListener('mousedown', handleClickOutside);
+        return () => {
+            document.removeEventListener('mousedown', handleClickOutside);
+        };
+    }, []);
+
 
     return (
         <div className="flex h-full">
             {/* ChannelBar */}
-            <div className="w-1/5 bg-gray-900 max-sm:hidden" >
+            <div
+                ref={channelBarRef}
+                className={`fixed inset-y-0 left-0 z-10 transform ${
+                isChannelBarVisible ? 'translate-x-0' : '-translate-x-full'
+            } transition-transform duration-300 ease-in-out sm:relative w-64 bg-gray-900 sm:translate-x-0 sm:block`} >
                 <ChannelBar />
             </div>
 
@@ -111,7 +136,11 @@ export default function Master() {
             </div>
 
             {/* UserList */}
-            <div className="w-1/5 bg-gray-900 max-sm:hidden">
+            <div
+                ref={userListRef}
+                className={`fixed inset-y-0 right-0 z-10 transform ${
+                isUserListVisible ? "translate-x-0" : "translate-x-full"
+            } transition-transform duration-300 ease-in-out sm:relative w-64 bg-gray-900 sm:translate-x-0 sm:block`}>
                 <UserList />
             </div>
         </div>
