@@ -11,23 +11,22 @@ import { Sidebar, SidebarBody, SidebarItem, SidebarSection} from "@/components/C
 
 export default function ChannelBar({ channels, handler }: { channels: Channel[], handler: ChannelHandler }) {
     return (
-        <div className="flex flex-col h-full overflow-y-auto bg-gray-800 text-white p-2">
-            <Heading level={3} className="text-white">Channels</Heading>
+        <div className="flex flex-col h-full overflow-y-auto bg-gray-900 text-gray-300 p-3">
+            <h3 className="text-sm font-semibold text-gray-400 uppercase mb-4">Channels</h3>
             <ul>
-                {Array.isArray(channels) &&
-                    channels.map((channel, index) => (
-                        <li
-                            key={index}
-                            className="cursor-pointer hover:bg-gray-600 p-1"
-                            onClick={(event) => handler.onClick(channel.id, event)}
-                        >
-                            {channel.name}
-                        </li>
-                    ))}
+                {channels.map((channel, index) => (
+                    <li
+                        key={index}
+                        className="cursor-pointer p-2 rounded hover:bg-gray-700 hover:text-white transition"
+                        onClick={(event) => handler.onClick(channel.id, event)}
+                    >
+                        # {channel.name}
+                    </li>
+                ))}
             </ul>
             <button
                 onClick={signout}
-                className="mt-auto p-2 bg-red-500 hover:bg-red-600 text-white"
+                className="mt-auto p-2 text-sm bg-red-600 hover:bg-red-500 rounded text-white"
             >
                 Logout
             </button>

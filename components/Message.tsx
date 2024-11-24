@@ -6,14 +6,15 @@ import styles from '@/app/ChatPage.module.css';
 import { MessageProps } from '@/utils/types/types'
 
 const Message: React.FC<MessageProps> = ({ user, body, timestamp }) => {
-  
+
   const date = new Date(timestamp)
-  const formattedDate = date.toLocaleString()
+    const formattedDate = date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
   return (
-    <div className={styles.message}>
-      <span className={styles.user}>{user}</span> <span className={styles.timestamp}>{formattedDate}</span>
-      <p>{body}</p>
-    </div>
+      <div className="mb-2">
+          <span className="text-sm font-bold text-gray-400">{user}</span>{' '}
+          <span className="text-xs text-gray-500">{formattedDate}</span>
+          <p className="text-sm text-gray-300">{body}</p>
+      </div>
   );
 };
 

@@ -3,10 +3,7 @@
  */
 import React, { useEffect, useRef } from 'react';
 import Message from '@/components/Message';
-import { MessageProps } from '@/utils/types/types'
-import styles from '@/app/ChatPage.module.css';
-
-
+import { MessageProps } from '@/utils/types/types';
 
 export default function PreviousMessages({ messages }: { messages: MessageProps[] }) {
     const bottomRef = useRef<HTMLDivElement | null>(null);
@@ -16,7 +13,7 @@ export default function PreviousMessages({ messages }: { messages: MessageProps[
     }, [messages]);
 
     return (
-        <div className="flex-1 overflow-y-auto p-4 bg-gray-900">
+        <div className="flex-1 overflow-y-auto p-4 bg-gray-800 text-gray-300">
             {messages.map((message, index) => (
                 <Message
                     key={index}

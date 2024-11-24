@@ -19,10 +19,10 @@ export default function ChatInput({ handlers }: { handlers: ChatInputProps }) {
 
     return (
         <>
-            <div className="flex items-center bg-gray-800 p-2 rounded-md border border-gray-700">
+            <div className="flex items-center bg-gray-700 p-2 rounded-lg border border-gray-600">
                 <form onSubmit={handlers.submitHandler} className="flex flex-1 items-center">
                     <input
-                        className="flex-1 bg-gray-700 text-white p-3 rounded-md outline-none placeholder-gray-400"
+                        className="flex-1 bg-gray-800 text-gray-300 p-3 rounded-md outline-none placeholder-gray-500"
                         type="text"
                         placeholder="Message #general"
                         value={handlers.value}
@@ -30,24 +30,21 @@ export default function ChatInput({ handlers }: { handlers: ChatInputProps }) {
                     />
                     <button
                         type="button"
-                        className="ml-2 p-2 text-white bg-gray-700 rounded-md hover:bg-gray-600"
+                        className="ml-2 p-2 text-sm text-gray-300 bg-gray-600 hover:bg-gray-500 rounded-md"
                         onClick={toggleEmojiMenu}
                     >
                         Emojis
                     </button>
                     <button
                         type="submit"
-                        className="ml-2 p-2 text-white bg-blue-600 rounded-md hover:bg-blue-500"
+                        className="ml-2 p-2 text-sm text-white bg-blue-600 hover:bg-blue-500 rounded-md"
                     >
                         Send
                     </button>
                 </form>
             </div>
             {showEmojiPicker && (
-                <EmojiPicker
-                    theme={Theme.DARK}
-                    onEmojiClick={handlers.emojisHandler}
-                />
+                <EmojiPicker theme={Theme.DARK} onEmojiClick={handlers.emojisHandler} />
             )}
         </>
     );
