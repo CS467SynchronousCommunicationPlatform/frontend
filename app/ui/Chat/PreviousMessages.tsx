@@ -2,10 +2,16 @@
  * Represents the previous messages in a channel
  */
 import React, { useEffect, useRef } from 'react';
-import Message from '@/components/Message';
-import { MessageProps } from '@/utils/types/types';
+import Message from '@/app/ui/Chat/Message';
+import { MessageProps } from '@/app/lib/types/types';
+import { useAppState } from '@/app/lib/contexts/AppContext';
 
-export default function PreviousMessages({ messages }: { messages: MessageProps[] }) {
+export default function PreviousMessages() {
+    const { state } = useAppState();
+    const { currentChannel, allMessages } = state;
+
+    const messages = allMessages.get(currentChannel) || [];
+
     const bottomRef = useRef<HTMLDivElement | null>(null);
 
     useEffect(() => {

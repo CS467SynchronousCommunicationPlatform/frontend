@@ -2,25 +2,35 @@
 
 
 import { signout } from '@/app/login/actions';
-import { Channel, ChannelHandler } from '@/utils/types/types'
-import { Button } from "@/components/Catalyst/button";
+import { Button } from "@/app/ui/Catalyst/button";
 import { PlusIcon} from "@heroicons/react/16/solid";
-import { Dialog, DialogActions, DialogBody, DialogDescription, DialogTitle } from '@/components/Catalyst/dialog'
-import {useState} from "react";
-import { Field, Label } from '@/components/Catalyst/fieldset'
-import { Input } from '@/components/Catalyst/input'
-import { Checkbox, CheckboxField, CheckboxGroup } from '@/components/Catalyst/checkbox'
-import {createNewChannel} from "@/utils/api/api";
+import { Dialog, DialogActions, DialogBody, DialogDescription, DialogTitle } from '@/app/ui/Catalyst/dialog'
+import {useState, useEffect} from "react";
+import { Field, Label } from '@/app/ui/Catalyst/fieldset'
+import { Input } from '@/app/ui/Catalyst/input'
+import { Checkbox, CheckboxField, CheckboxGroup } from '@/app/ui/Catalyst/checkbox'
+import {
+    fetchAllChannelsForCurrentUser,
+    fetchAllPreviousMessages,
+    fetchChannelUsers,
+    createNewChannel
+} from "@/app/lib/api/api";
+import { useAppState } from '@/app/lib/contexts/AppContext';
 
 
 
 
 
-export default function ChannelBar({ channels, handler, userid, onChannelCreate }: { channels: Channel[], handler: ChannelHandler, userid: string, onChannelCreate: (newChannel: Channel) => void; }) {
+export default function ChannelBar() {
+    const { state, dispatch } = useAppState();
+    const { channels, currentChannel, user } = state;
+
     let [isOpen, setIsOpen] = useState(false)
     const [name, setName] = useState('')
     const [description, setDescription] = useState('')
     const [isPrivate, setIsPrivate] = useState('True')
+    // A new state to trigger effect for fetching data
+    const [shouldFetchData, setShouldFetchData] = useState(false);
 
     let togglePrivate = () => {
         console.log(isPrivate)
@@ -38,15 +48,18 @@ export default function ChannelBar({ channels, handler, userid, onChannelCreate 
         console.log(description)
 
         try {
-            const response = await createNewChannel(name.trim(), description, isPrivate, userid);
+            // @ts-ignore
+            const response = await createNewChannel(name.trim(), description, isPrivate, user.id);
             const newChannel = {
                 id: response.id,
                 name: name.trim(),
                 description,
                 private: isPrivate === 'True',
             };
+            dispatch({ type: 'SET_CHANNELS', payload: [...channels, newChannel] });
             alert("Channel created successfully!");
-            onChannelCreate(newChannel);
+            // Set shouldFetchData to true to trigger useEffect
+            setShouldFetchData(true);
             // Optionally, update UI with new channel details
             setIsOpen(false); // Close the dialog
 
@@ -54,6 +67,32 @@ export default function ChannelBar({ channels, handler, userid, onChannelCreate 
             console.error("Error creating channel:", err);
             alert("Failed to create channel. Please try again.");
         }
+    };
+
+    useEffect(() => {
+        if (shouldFetchData) {
+            const fetchData = async () => {
+                try {
+                    const [updatedChannels, newMessages, newUserList] = await Promise.all([
+                        // @ts-ignore
+                        fetchAllChannelsForCurrentUser(user),
+                        fetchAllPreviousMessages(channels),
+                        fetchChannelUsers(channels),
+                    ]);
+                    dispatch({ type: 'SET_CHANNELS', payload: updatedChannels });
+                    dispatch({ type: 'SET_MESSAGES', payload: newMessages });
+                    dispatch({ type: 'SET_CHANNEL_USERS', payload: newUserList });
+                } catch (error) {
+                    console.error("Failed to fetch updated data:", error);
+                }
+            };
+            fetchData();
+            setShouldFetchData(false); // Reset shouldFetchData flag
+        }
+    }, [shouldFetchData, user, channels, dispatch]);
+
+    const handleChannelSelect = (channelId: number) => {
+        dispatch({ type: 'SET_CURRENT_CHANNEL', payload: channelId });
     };
 
     // Group channels by public and private
@@ -68,11 +107,11 @@ export default function ChannelBar({ channels, handler, userid, onChannelCreate 
             <div>
                 <h4 className="text-xs font-bold text-gray-500 uppercase mb-2">Public Channels</h4>
                 <ul>
-                    {publicChannels.map((channel, index) => (
+                    {publicChannels.map((channel) => (
                         <li
-                            key={index}
-                            className="cursor-pointer p-2 rounded hover:bg-gray-700 hover:text-white transition"
-                            onClick={(event) => handler.onClick(channel.id, event)}
+                            key={channel.id}
+                            className={`cursor-pointer p-2 rounded transition ${currentChannel === channel.id ? 'bg-gray-700 text-white' : 'hover:bg-gray-700 hover:text-white'}`}
+                            onClick={() => handleChannelSelect(channel.id)}
                         >
                             # {channel.name}
                         </li>
@@ -86,9 +125,9 @@ export default function ChannelBar({ channels, handler, userid, onChannelCreate 
                 <ul>
                     {privateChannels.map((channel, index) => (
                         <li
-                            key={index}
-                            className="cursor-pointer p-2 rounded hover:bg-gray-700 hover:text-white transition"
-                            onClick={(event) => handler.onClick(channel.id, event)}
+                            key={channel.id}
+                            className={`cursor-pointer p-2 rounded transition ${currentChannel === channel.id ? 'bg-gray-700 text-white' : 'hover:bg-gray-700 hover:text-white'}`}
+                            onClick={() => handleChannelSelect(channel.id)}
                         >
                             # {channel.name}
                         </li>

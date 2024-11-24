@@ -1,24 +1,20 @@
 "use client";
 
 import React, { useState } from 'react';
-import { updateUserDisplayName } from '@/utils/api/api';
-import { User } from '@supabase/supabase-js';
-import {Heading} from "@/components/Catalyst/heading";
-import {Divider} from "@/components/Catalyst/divider";
-import {Text} from "@/components/Catalyst/text";
+import { updateUserDisplayName } from '@/app/lib/api/api';
+import { Heading } from "@/app/ui/Catalyst/heading";
+import { Divider } from "@/app/ui/Catalyst/divider";
+import { Text } from "@/app/ui/Catalyst/text";
+import { useAppState } from '@/app/lib/contexts/AppContext';
 
-interface AdminPanelProps {
-    user: User;
-}
-
-const AdminPanelComponent: React.FC<AdminPanelProps> = ({ user }) => {
+const AdminPanelComponent: React.FC = () => {
+    const { state } = useAppState();
     const [displayName, setDisplayName] = useState('');
     const [errorMessage, setErrorMessage] = useState('');
 
     const handleSubmit = async (event: React.FormEvent) => {
         event.preventDefault();
 
-        // Alphanumeric validation
         const alphanumericRegex = /^[a-zA-Z0-9 ]*$/;
         if (!alphanumericRegex.test(displayName)) {
             setErrorMessage('Display name can only contain letters, numbers, and spaces.');
@@ -28,7 +24,8 @@ const AdminPanelComponent: React.FC<AdminPanelProps> = ({ user }) => {
         setErrorMessage('');
 
         try {
-            const data = await updateUserDisplayName(user.id, displayName);
+            // @ts-ignore
+            const data = await updateUserDisplayName(state.user.id, displayName);
 
             if (data) {
                 console.log('Display name updated:', data);
@@ -41,13 +38,12 @@ const AdminPanelComponent: React.FC<AdminPanelProps> = ({ user }) => {
             console.error('Error:', error);
         }
     };
-    console.log(user)
 
     return (
         <div>
             <Heading>Admin Panel</Heading>
             <Divider className={'my-6'}></Divider>
-            <Text>Welcome to the admin panel, {user.user_metadata.display_}</Text>
+            <Text>Welcome to the admin panel, {state.user?.user_metadata.displayName}</Text>
             <form onSubmit={handleSubmit}>
                 <label>
                     Display Name:
@@ -60,7 +56,7 @@ const AdminPanelComponent: React.FC<AdminPanelProps> = ({ user }) => {
                 </label>
                 <br />
                 <button type="submit">Submit</button>
-                {errorMessage && <p style={{color: 'red'}}>{errorMessage}</p>}
+                {errorMessage && <p style={{ color: 'red' }}>{errorMessage}</p>}
             </form>
         </div>
     );
