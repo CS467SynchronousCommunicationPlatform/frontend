@@ -39,14 +39,10 @@ export default async function RootLayout({ children }: { children: ReactNode }) 
         <body className={inter.className}>
         <AppProvider initialState={initialState}>
             <AuthGuard>
-            <StackedLayout
-                navbar={user ? <NavBar />: null}
-                sidebar={user ? <Sidebar />: null}
-            >
+            <NavBar />
+                {children}
 
-                    {children}
 
-            </StackedLayout>
             </AuthGuard>
         </AppProvider>
         </body>
