@@ -110,17 +110,6 @@ export default function Master() {
             setMsgBody('')
         }
     }
-    /**
-     * onClick handler for when a user selects a channel
-     * Set the current channel and load appropriate messages
-     * @param channel_id the channel_id of the selected channel
-     * @param event MouseEvent because the ChannelBar consists of li elements
-     */
-    const selectChannel = (channel_id: number, event: React.MouseEvent<HTMLLIElement>) => {
-        // TODO: get rid of console.log
-        console.log(event)
-        dispatch({ type: 'SET_CURRENT_CHANNEL', payload: channel_id });
-    }
 
     const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         setMsgBody(event.target.value)
@@ -138,9 +127,6 @@ export default function Master() {
         value: msgBody,
     }
 
-    const channelHandler: ChannelHandler = {
-        onClick: selectChannel
-    }
 
     return (
         <div className="flex h-full">
