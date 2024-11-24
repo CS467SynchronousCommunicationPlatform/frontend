@@ -10,7 +10,6 @@
 
 import { useEffect, useState } from 'react'
 import { socket, updateSocketAuth } from '@/socket'
-import { type User } from "@supabase/supabase-js"
 import { MessageProps, Channel, ChannelHandler, ChatInputProps, ChannelUser } from '@/app/lib/types/types'
 import ChatInput from '@/app/ui/Chat/ChatInput'
 import PreviousMessages from '@/app/ui/Chat/PreviousMessages'
@@ -29,9 +28,7 @@ import {
  * The Chat component is the real-time layer of our application
  * It connects the user to our backend socket server and allows them to send
  * messages to any channels they are currently subscribed to.
- * @param user: the user authenticated through Supabase - is a Supabase User type
- * @param previousMessages: a map of all of the previous messages in channels the user is subscribed to
- * @param channels: the channels the user is subscribed to
+
  * @returns
  */
 export default function Master() {
