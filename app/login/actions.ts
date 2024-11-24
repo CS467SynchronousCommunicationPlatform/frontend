@@ -8,7 +8,7 @@
 import { revalidatePath } from 'next/cache'
 import { redirect } from 'next/navigation'
 
-import { createClient } from '@/utils/supabase/server'
+import { createClient } from '@/app/lib/supabase/server'
 
 /*
 From Supabase docs on authentication redirects (https://supabase.com/docs/guides/auth/redirect-urls#vercel-preview-urls)

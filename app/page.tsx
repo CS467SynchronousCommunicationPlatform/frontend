@@ -1,16 +1,16 @@
 import React from 'react';
-import { createClient } from '@/utils/supabase/server';
+import { createClient } from '@/app/lib/supabase/server';
 import { redirect } from 'next/navigation';
-import NavBar  from "@/components/NavBar";
-import {StackedLayout} from "@/components/Catalyst/stacked-layout";
-import { Channel } from '@/utils/types/types'
-import {Sidebar} from "@/components/Catalyst/sidebar";
+import NavBar  from "@/app/ui/components/NavBar";
+import {StackedLayout} from "@/app/ui/Catalyst/stacked-layout";
+import { Channel } from '@/app/lib/types/types'
+import {Sidebar} from "@/app/ui/Catalyst/sidebar";
 import {
     fetchAllChannelsForCurrentUser,
     fetchAllPreviousMessages,
     fetchChannelUsers
-} from '@/utils/api/api';
-import Master from "@/components/Master";
+} from '@/app/lib/api/api';
+import Master from "@/app/ui/components/Master";
 // Ensure AdminPanelComponent is a proper component
 
 /**

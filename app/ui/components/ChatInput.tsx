@@ -5,7 +5,7 @@
 "use client";
 
 import { useState } from 'react'
-import { ChatInputProps } from '@/utils/types/types'
+import { ChatInputProps } from '@/app/lib/types/types'
 import EmojiPicker, { Theme } from 'emoji-picker-react'
 
 

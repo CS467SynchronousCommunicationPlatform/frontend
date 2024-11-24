@@ -2,15 +2,15 @@
 
 
 import { signout } from '@/app/login/actions';
-import { Channel, ChannelHandler } from '@/utils/types/types'
-import { Button } from "@/components/Catalyst/button";
+import { Channel, ChannelHandler } from '@/app/lib/types/types'
+import { Button } from "@/app/ui/Catalyst/button";
 import { PlusIcon} from "@heroicons/react/16/solid";
-import { Dialog, DialogActions, DialogBody, DialogDescription, DialogTitle } from '@/components/Catalyst/dialog'
+import { Dialog, DialogActions, DialogBody, DialogDescription, DialogTitle } from '@/app/ui/Catalyst/dialog'
 import {useState} from "react";
-import { Field, Label } from '@/components/Catalyst/fieldset'
-import { Input } from '@/components/Catalyst/input'
-import { Checkbox, CheckboxField, CheckboxGroup } from '@/components/Catalyst/checkbox'
-import {createNewChannel} from "@/utils/api/api";
+import { Field, Label } from '@/app/ui/Catalyst/fieldset'
+import { Input } from '@/app/ui/Catalyst/input'
+import { Checkbox, CheckboxField, CheckboxGroup } from '@/app/ui/Catalyst/checkbox'
+import {createNewChannel} from "@/app/lib/api/api";
 
 
 

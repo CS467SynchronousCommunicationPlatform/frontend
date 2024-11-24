@@ -1,4 +1,4 @@
-import { Channel, MessageProps, ChannelMessage, ChannelUser } from '@/utils/types/types'
+import { Channel, MessageProps, ChannelMessage, ChannelUser } from '@/app/lib/types/types'
 import { type User } from '@supabase/supabase-js'
 
 /**

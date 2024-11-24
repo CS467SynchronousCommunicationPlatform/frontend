@@ -1,5 +1,5 @@
 import React from 'react';
-import { ChannelUser } from '@/utils/types/types';
+import { ChannelUser } from '@/app/lib/types/types';
 
 const UserList: React.FC<{ users: ChannelUser[] }> = ({ users }) => {
     return (

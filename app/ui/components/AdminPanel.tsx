@@ -1,11 +1,11 @@
 "use client";
 
 import React, { useState } from 'react';
-import { updateUserDisplayName } from '@/utils/api/api';
+import { updateUserDisplayName } from '@/app/lib/api/api';
 import { User } from '@supabase/supabase-js';
-import {Heading} from "@/components/Catalyst/heading";
-import {Divider} from "@/components/Catalyst/divider";
-import {Text} from "@/components/Catalyst/text";
+import {Heading} from "@/app/ui/Catalyst/heading";
+import {Divider} from "@/app/ui/Catalyst/divider";
+import {Text} from "@/app/ui/Catalyst/text";
 
 interface AdminPanelProps {
     user: User;

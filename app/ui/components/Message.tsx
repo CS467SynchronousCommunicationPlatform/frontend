@@ -2,7 +2,7 @@
  * Represents a message sent to a channel
  */
 import React from 'react';
-import { MessageProps } from '@/utils/types/types'
+import { MessageProps } from '@/app/lib/types/types'
 
 const Message: React.FC<MessageProps> = ({ user, body, timestamp }) => {
 

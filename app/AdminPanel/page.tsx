@@ -1,10 +1,10 @@
 import React from 'react';
-import { createClient } from '@/utils/supabase/server';
+import { createClient } from '@/app/lib/supabase/server';
 import { redirect } from 'next/navigation';
-import NavBar  from "@/components/NavBar";
-import {StackedLayout} from "@/components/Catalyst/stacked-layout";
-import AdminPanelComponent from "@/components/AdminPanel";
-import {Sidebar} from "@/components/Catalyst/sidebar"; // Ensure AdminPanelComponent is a proper component
+import NavBar  from "@/app/ui/components/NavBar";
+import {StackedLayout} from "@/app/ui/Catalyst/stacked-layout";
+import AdminPanelComponent from "@/app/ui/components/AdminPanel";
+import {Sidebar} from "@/app/ui/Catalyst/sidebar"; // Ensure AdminPanelComponent is a proper component
 
 /**
  * The entry point to our Admin Panel.

@@ -11,17 +11,17 @@
 import { useEffect, useState } from 'react'
 import { socket, updateSocketAuth } from '@/socket'
 import { type User } from "@supabase/supabase-js"
-import { MessageProps, Channel, ChannelHandler, ChatInputProps, ChannelUser } from '@/utils/types/types'
-import ChatInput from '@/components/ChatInput'
-import PreviousMessages from '@/components/PreviousMessages'
-import UserList from '@/components/UserList'
-import ChannelBar from '@/components/ChannelBar';
+import { MessageProps, Channel, ChannelHandler, ChatInputProps, ChannelUser } from '@/app/lib/types/types'
+import ChatInput from '@/app/ui/components/ChatInput'
+import PreviousMessages from '@/app/ui/components/PreviousMessages'
+import UserList from '@/app/ui/components/UserList'
+import ChannelBar from '@/app/ui/components/ChannelBar';
 import { EmojiClickData } from 'emoji-picker-react'
 import {
     fetchAllChannelsForCurrentUser,
     fetchAllPreviousMessages,
     fetchChannelUsers
-} from '@/utils/api/api';
+} from '@/app/lib/api/api';
 
 
 /**

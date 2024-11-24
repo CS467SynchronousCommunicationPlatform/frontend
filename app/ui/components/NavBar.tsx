@@ -1,7 +1,7 @@
 "use client"; // Mark this as a client component
 
 import React from 'react';
-import { Navbar, NavbarItem, NavbarSection } from '@/components/Catalyst/navbar'
+import { Navbar, NavbarItem, NavbarSection } from '@/app/ui/Catalyst/navbar'
 
 const NavBar = () => {
 

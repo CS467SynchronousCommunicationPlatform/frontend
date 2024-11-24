@@ -2,8 +2,8 @@
  * Represents the previous messages in a channel
  */
 import React, { useEffect, useRef } from 'react';
-import Message from '@/components/Message';
-import { MessageProps } from '@/utils/types/types';
+import Message from '@/app/ui/components/Message';
+import { MessageProps } from '@/app/lib/types/types';
 
 export default function PreviousMessages({ messages }: { messages: MessageProps[] }) {
     const bottomRef = useRef<HTMLDivElement | null>(null);
