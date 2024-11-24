@@ -32,7 +32,7 @@ const AppContext = createContext<{
 });
 
 // Define a reducer
-const reducer = (state: AppState, action: any) => {
+const reducer = (state: AppState, action: any): AppState => {
     switch (action.type) {
         case 'SET_USER':
             return { ...state, user: action.payload };
@@ -50,9 +50,11 @@ const reducer = (state: AppState, action: any) => {
 };
 
 // Create a provider component
-export const AppProvider: React.FC<{ children: ReactNode, initialState?: AppState }> = ({ children, initialState }) => {
-    const initialAppState = initialState ? initialState : initialState;
-    const [state, dispatch] = useReducer(reducer, initialAppState);
+export const AppProvider: React.FC<{ children: ReactNode; initialState: AppState }> = ({
+                                                                                           children,
+                                                                                           initialState,
+                                                                                       }) => {
+    const [state, dispatch] = useReducer(reducer, initialState);
 
     return (
         <AppContext.Provider value={{ state, dispatch }}>
@@ -65,7 +67,7 @@ export const AppProvider: React.FC<{ children: ReactNode, initialState?: AppStat
 export const useAppState = () => {
     const context = useContext(AppContext);
     if (!context) {
-        throw new Error("useAppState must be used within an AppProvider");
+        throw new Error('useAppState must be used within an AppProvider');
     }
     return context;
 };
