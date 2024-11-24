@@ -10,8 +10,8 @@ import {
     fetchAllPreviousMessages,
     fetchChannelUsers,
 } from '@/app/lib/api/api';
-import { redirect } from 'next/navigation';
 import { ReactNode } from 'react';
+import AuthGuard from './lib/authguard';
 
 export default async function RootLayout({ children }: { children: ReactNode }) {
     const supabase = await createClient();
@@ -19,14 +19,10 @@ export default async function RootLayout({ children }: { children: ReactNode }) 
     // Check if user is authenticated
     const { data: { user } } = await supabase.auth.getUser();
 
-    if (!user) {
-        return redirect('/login');
-    }
-
     // Fetch data for initial state
-    const channels = await fetchAllChannelsForCurrentUser(user);
-    const previousMessages = await fetchAllPreviousMessages(channels);
-    const channelUsers = await fetchChannelUsers(channels);
+    const channels = user ? await fetchAllChannelsForCurrentUser(user) : [];
+    const previousMessages = user ? await fetchAllPreviousMessages(channels) : [];
+    const channelUsers = user ? await fetchChannelUsers(channels) : [];
 
     const initialState = {
         user,
@@ -40,12 +36,16 @@ export default async function RootLayout({ children }: { children: ReactNode }) 
         <html lang="en">
         <body className={inter.className}>
         <AppProvider initialState={initialState}>
+            <AuthGuard>
             <StackedLayout
-                navbar={<NavBar />}
-                sidebar={<Sidebar />}
+                navbar={user ? <NavBar />: null}
+                sidebar={user ? <Sidebar />: null}
             >
-                {children}
+
+                    {children}
+
             </StackedLayout>
+            </AuthGuard>
         </AppProvider>
         </body>
         </html>
