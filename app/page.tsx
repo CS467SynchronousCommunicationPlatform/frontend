@@ -12,6 +12,7 @@ import {
 } from '@/app/lib/api/api';
 import Master from "@/app/ui/Master/Master";
 // Ensure AdminPanelComponent is a proper component
+import { AppProvider, useAppState } from '@/app/lib/contexts/AppContext';
 
 /**
  * The entry point to our Admin Panel.
@@ -40,6 +41,15 @@ export default async function HomePage() {
 
     // fetch all users for all channels a user is subscribed to
     const channelUsers = await fetchChannelUsers(channels)
+
+    // set initial global state
+    const initialState = {
+        user,
+        channels,
+        currentChannel: 4,
+        allMessages: new Map(previousMessages),
+        channelUsers: new Map(channelUsers),
+    }
 
     return (
         <StackedLayout
