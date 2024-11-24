@@ -11,37 +11,44 @@ import EmojiPicker, { Theme } from 'emoji-picker-react'
 
 
 export default function ChatInput({ handlers }: { handlers: ChatInputProps }) {
-    const [showEmojiPicker, setShowEmojiPicker] = useState<boolean>(false)
+    const [showEmojiPicker, setShowEmojiPicker] = useState<boolean>(false);
 
     const toggleEmojiMenu = () => {
-        setShowEmojiPicker((prevState: boolean) => !prevState)
-    }
+        setShowEmojiPicker((prevState: boolean) => !prevState);
+    };
+
     return (
         <>
-            <div className={styles.chatInputContainer}>
-                <form onSubmit={handlers.submitHandler} className={styles.chatForm}>
-                    <input 
-                        className={styles.messageInput}
+            <div className="flex items-center bg-gray-800 p-2 rounded-md border border-gray-700">
+                <form onSubmit={handlers.submitHandler} className="flex flex-1 items-center">
+                    <input
+                        className="flex-1 bg-gray-700 text-white p-3 rounded-md outline-none placeholder-gray-400"
                         type="text"
-                        placeholder="Message general"
+                        placeholder="Message #general"
                         value={handlers.value}
                         onChange={handlers.onChangeHandler}
                     />
                     <button
                         type="button"
-                        className="rounded-lg text-sm py-2 mb-2 px-3 me-2"
+                        className="ml-2 p-2 text-white bg-gray-700 rounded-md hover:bg-gray-600"
                         onClick={toggleEmojiMenu}
-                    >Emojis
+                    >
+                        Emojis
                     </button>
-                    <button type="submit" className="rounded-lg text-sm py-2 mb-2 px-3 me-2">Send message</button>
+                    <button
+                        type="submit"
+                        className="ml-2 p-2 text-white bg-blue-600 rounded-md hover:bg-blue-500"
+                    >
+                        Send
+                    </button>
                 </form>
             </div>
             {showEmojiPicker && (
-                <EmojiPicker 
-                    theme={Theme.AUTO} 
+                <EmojiPicker
+                    theme={Theme.DARK}
                     onEmojiClick={handlers.emojisHandler}
                 />
             )}
         </>
-    )
+    );
 }
