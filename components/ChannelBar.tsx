@@ -1,29 +1,129 @@
 "use client";
 
 
-import styles from '@/app/ChatPage.module.css';
 import { signout } from '@/app/login/actions';
 import { Channel, ChannelHandler } from '@/utils/types/types'
-import {Heading} from "@/components/Catalyst/heading";
-import {Divider} from "@/components/Catalyst/divider";
-import { Sidebar, SidebarBody, SidebarItem, SidebarSection} from "@/components/Catalyst/sidebar";
+import { Button } from "@/components/Catalyst/button";
+import { PlusIcon} from "@heroicons/react/16/solid";
+import { Dialog, DialogActions, DialogBody, DialogDescription, DialogTitle } from '@/components/Catalyst/dialog'
+import {useState} from "react";
+import { Field, Label } from '@/components/Catalyst/fieldset'
+import { Input } from '@/components/Catalyst/input'
+import { Checkbox, CheckboxField, CheckboxGroup } from '@/components/Catalyst/checkbox'
+import {createNewChannel} from "@/utils/api/api";
 
 
-export default function ChannelBar({ channels, handler }: { channels: Channel[], handler: ChannelHandler }) {
+
+
+
+export default function ChannelBar({ channels, handler, userid, onChannelCreate }: { channels: Channel[], handler: ChannelHandler, userid: string, onChannelCreate: (newChannel: Channel) => void; }) {
+    let [isOpen, setIsOpen] = useState(false)
+    const [name, setName] = useState('')
+    const [description, setDescription] = useState('')
+    const [isPrivate, setIsPrivate] = useState('True')
+
+    let togglePrivate = () => {
+        console.log(isPrivate)
+        setIsPrivate(isPrivate => isPrivate === 'True' ? 'False' : 'True');
+
+    }
+
+    // Handler for creating a new channel
+    const createChannel = async () => {
+        if (!/^[a-zA-Z0-9 ]+$/.test(name) || !/^[a-zA-Z0-9 ]+$/.test(description)) {
+            alert("Channel name and description can only contain alphanumeric characters and spaces.");
+            return;
+        }
+        console.log(name)
+        console.log(description)
+
+        try {
+            const response = await createNewChannel(name.trim(), description, isPrivate, userid);
+            const newChannel = {
+                id: response.id,
+                name: name.trim(),
+                description,
+                private: isPrivate === 'True',
+            };
+            alert("Channel created successfully!");
+            onChannelCreate(newChannel);
+            // Optionally, update UI with new channel details
+            setIsOpen(false); // Close the dialog
+
+        } catch (err) {
+            console.error("Error creating channel:", err);
+            alert("Failed to create channel. Please try again.");
+        }
+    };
+
+    // Group channels by public and private
+    const publicChannels = channels.filter((channel) => !channel.private);
+    const privateChannels = channels.filter((channel) => channel.private);
+
     return (
         <div className="flex flex-col h-full overflow-y-auto bg-gray-900 text-gray-300 p-3">
             <h3 className="text-sm font-semibold text-gray-400 uppercase mb-4">Channels</h3>
-            <ul>
-                {channels.map((channel, index) => (
-                    <li
-                        key={index}
-                        className="cursor-pointer p-2 rounded hover:bg-gray-700 hover:text-white transition"
-                        onClick={(event) => handler.onClick(channel.id, event)}
-                    >
-                        # {channel.name}
-                    </li>
-                ))}
-            </ul>
+
+            {/* Public Channels Section */}
+            <div>
+                <h4 className="text-xs font-bold text-gray-500 uppercase mb-2">Public Channels</h4>
+                <ul>
+                    {publicChannels.map((channel, index) => (
+                        <li
+                            key={index}
+                            className="cursor-pointer p-2 rounded hover:bg-gray-700 hover:text-white transition"
+                            onClick={(event) => handler.onClick(channel.id, event)}
+                        >
+                            # {channel.name}
+                        </li>
+                    ))}
+                </ul>
+            </div>
+
+            {/* Private Channels Section */}
+            <div className="mt-4">
+                <h4 className="text-xs font-bold text-gray-500 uppercase mb-2">Private Channels</h4>
+                <ul>
+                    {privateChannels.map((channel, index) => (
+                        <li
+                            key={index}
+                            className="cursor-pointer p-2 rounded hover:bg-gray-700 hover:text-white transition"
+                            onClick={(event) => handler.onClick(channel.id, event)}
+                        >
+                            # {channel.name}
+                        </li>
+                    ))}
+                </ul>
+            </div>
+
+            {/* Create Channel Button and Dialog */}
+            <Button outline onClick={() => setIsOpen(true)}>
+                Create Channel <PlusIcon />
+            </Button>
+            <Dialog open={isOpen} onClose={setIsOpen}>
+                <DialogTitle>Create Channel</DialogTitle>
+                <DialogDescription>
+                    Channel names can only contain alphanumeric characters a-z 0-9 and spaces.
+                </DialogDescription>
+                <DialogBody>
+                    <Field>
+                        <Label>Channel Name</Label>
+                        <Input name="name" placeholder="channel name" value={name} onChange={(event) => setName(event.target.value)}/>
+                        <Label>Channel Description</Label>
+                        <Input name="description" placeholder="channel description" value={description} onChange={(event) => setDescription(event.target.value)}/>
+                        <CheckboxGroup>
+                            <CheckboxField>
+                                <Checkbox name="privacy" value={isPrivate} defaultChecked onChange={togglePrivate} />
+                                <Label>Private Channel?</Label>
+                            </CheckboxField>
+                        </CheckboxGroup>
+                    </Field>
+                </DialogBody>
+                <DialogActions>
+                    <Button onClick={() => setIsOpen(false)}>Cancel</Button>
+                    <Button onClick={createChannel}>Create</Button>
+                </DialogActions>
+            </Dialog>
             <button
                 onClick={signout}
                 className="mt-auto p-2 text-sm bg-red-600 hover:bg-red-500 rounded text-white"

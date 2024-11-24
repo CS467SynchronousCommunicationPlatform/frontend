@@ -6,7 +6,6 @@
 
 import { useState } from 'react'
 import { ChatInputProps } from '@/utils/types/types'
-import styles from '@/app/ChatPage.module.css'
 import EmojiPicker, { Theme } from 'emoji-picker-react'
 
 

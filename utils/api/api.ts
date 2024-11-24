@@ -21,6 +21,7 @@ export async function fetchAllChannelsForCurrentUser(user: User) {
         const response = await fetch(`${api}/users/${user.id}/channels`, apiHeaders)
         if (response.ok) {
             const data: Channel[] = await response.json()
+            console.log(data)
             return data
         }
     } catch(error) {
@@ -132,7 +133,7 @@ export async function fetchAllUsers() {
  * @param isPrivate Boolean indicating if the channel is private
  * @returns The newly created channel data or an error message
  */
-export async function createNewChannel(name: string, description: string, isPrivate: boolean) {
+export async function createNewChannel(name: string, description: string, isPrivate: string, userid: string) {
     const requestBody = {
         name,
         description,
@@ -150,6 +151,8 @@ export async function createNewChannel(name: string, description: string, isPriv
 
         if (response.ok) {
             const channel = await response.json();
+            console.log(channel[0].id)
+            await addUserToChannel(channel[0].id.toString(), userid)
             return channel;
         } else {
             const errorData = await response.json();
@@ -168,7 +171,7 @@ export async function createNewChannel(name: string, description: string, isPriv
  * @param userId The ID of the user to be added
  * @returns A success message or an error message
  */
-export async function addUserToChannel(channelId: number, userId: string) {
+export async function addUserToChannel(channelId: string, userId: string) {
     const requestBody = {
         userId,
     };
@@ -183,8 +186,7 @@ export async function addUserToChannel(channelId: number, userId: string) {
         });
 
         if (response.ok) {
-            const result = await response.json();
-            return result;
+            return response;
         } else {
             const errorData = await response.json();
             throw new Error(errorData.message || 'Failed to add user to channel');

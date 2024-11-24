@@ -34,6 +34,7 @@ export default async function AdminPanelPage() {
     // fetch all channels the user is subscribed to
     const channels: Channel[] = await fetchAllChannelsForCurrentUser(user)
 
+
     // fetch previous messages
     const previousMessages = await fetchAllPreviousMessages(channels)
 
