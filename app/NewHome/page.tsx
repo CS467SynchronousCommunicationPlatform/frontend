@@ -9,7 +9,10 @@ import {
     fetchAllChannelsForCurrentUser,
     fetchAllPreviousMessages,
     fetchChannelUsers
-} from '@/utils/api/api';// Ensure AdminPanelComponent is a proper component
+} from '@/utils/api/api';
+import Chat from "@/components/Chat";
+import Master from "@/components/Master";
+// Ensure AdminPanelComponent is a proper component
 
 /**
  * The entry point to our Admin Panel.
@@ -29,13 +32,26 @@ export default async function AdminPanelPage() {
 
     // CHANNEL BAR HELP
     // fetch all channels the user is subscribed to
+    // fetch all channels the user is subscribed to
     const channels: Channel[] = await fetchAllChannelsForCurrentUser(user)
+
+    // fetch previous messages
+    const previousMessages = await fetchAllPreviousMessages(channels)
+
+    // fetch all users for all channels a user is subscribed to
+    const channelUsers = await fetchChannelUsers(channels)
 
     return (
         <StackedLayout
             navbar={<NavBar />}
             sidebar={<Sidebar />}
         >
+            <Master
+                user={user}
+                previousMessages={previousMessages}
+                channels={channels}
+                channelUsers={channelUsers}
+            />
         </StackedLayout>
     );
 }

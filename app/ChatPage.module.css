@@ -16,10 +16,6 @@
     overflow-y: auto;
 }
 
-.sidebarLeft h3, .sidebarRight h3 {
-    margin-bottom: 20px;
-    color: #b9bbbe;
-}
 
 .sidebarLeft ul, .userStatus ul {
     list-style: none;

@@ -9,7 +9,7 @@ import styles from '@/app/ChatPage.module.css';
 
 export default function PreviousMessages({ messages }: { messages: MessageProps[] }) {
     return (
-        <div className={styles.chatWindow}>
+        <div className="flex-1 overflow-y-auto p-4 bg-gray-900">
             {messages.map((message, index) => (
                 <Message
                     key={index}
