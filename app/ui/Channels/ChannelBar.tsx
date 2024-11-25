@@ -8,7 +8,7 @@ import { Dialog, DialogActions, DialogBody, DialogDescription, DialogTitle } fro
 import {useState, useEffect} from "react";
 import { Field, Label } from '@/app/ui/Catalyst/fieldset'
 import { Input } from '@/app/ui/Catalyst/input'
-import { Checkbox, CheckboxField, CheckboxGroup } from '@/app/ui/Catalyst/checkbox'
+import { Checkbox, CheckboxField } from '@/app/ui/Catalyst/checkbox'
 import {
     fetchAllChannelsForCurrentUser,
     fetchAllPreviousMessages,
@@ -23,7 +23,7 @@ import { useAppState } from '@/app/lib/contexts/AppContext';
 
 export default function ChannelBar() {
     const { state, dispatch } = useAppState();
-    const { channels, currentChannel, user } = state;
+    const { channels, currentChannel, user, unreadMessagesCount } = state;
 
     let [isOpen, setIsOpen] = useState(false)
     const [name, setName] = useState('')
@@ -93,6 +93,7 @@ export default function ChannelBar() {
 
     const handleChannelSelect = (channelId: number) => {
         dispatch({ type: 'SET_CURRENT_CHANNEL', payload: channelId });
+        dispatch({ type: 'RESET_UNREAD_COUNT', payload: channelId });
     };
 
     // Group channels by public and private
@@ -100,62 +101,70 @@ export default function ChannelBar() {
     const privateChannels = channels.filter((channel) => channel.private);
 
     return (
-        <div className="flex flex-col h-full overflow-y-auto bg-gray-900 text-gray-300 p-3  mt-16 sm:mt-0">
-            <h3 className="text-sm font-semibold text-gray-400 uppercase mb-4">Channels</h3>
-
-            {/* Public Channels Section */}
-            <div>
-                <h4 className="text-xs font-bold text-gray-500 uppercase mb-2">Public Channels</h4>
-                <ul>
-                    {publicChannels.map((channel) => (
-                        <li
-                            key={channel.id}
-                            className={`cursor-pointer p-2 rounded transition ${currentChannel === channel.id ? 'bg-gray-700 text-white' : 'hover:bg-gray-700 hover:text-white'}`}
-                            onClick={() => handleChannelSelect(channel.id)}
-                        >
-                            # {channel.name}
+        <div className="flex flex-col h-full overflow-y-auto bg-gray-900 text-gray-300 p-3 mt-16 sm:mt-0">
+            <h3 className="text-sm font-semibold text-gray-400 uppercase mb-4">Public Channels</h3>
+            <ul>
+                {publicChannels.map(channel => {
+                    const unreadCount = unreadMessagesCount.get(channel.id) || 0;
+                    return (
+                        <li key={channel.id}
+                            className={`p-2 text-sm rounded hover:bg-gray-700 hover:text-white transition flex justify-between items-center ${channel.id === currentChannel ? 'bg-gray-700' : ''}`}>
+                            <span onClick={() => handleChannelSelect(channel.id)} className="cursor-pointer flex-grow">
+                                {channel.name}
+                            </span>
+                            {unreadCount > 0 && (
+                                <span className="ml-2 bg-red-500 text-white text-xs rounded-full px-2 py-1">
+                                    {unreadCount}
+                                </span>
+                            )}
                         </li>
-                    ))}
-                </ul>
-            </div>
-
-            {/* Private Channels Section */}
-            <div className="mt-4">
-                <h4 className="text-xs font-bold text-gray-500 uppercase mb-2">Private Channels</h4>
-                <ul>
-                    {privateChannels.map((channel, index) => (
-                        <li
-                            key={channel.id}
-                            className={`cursor-pointer p-2 rounded transition ${currentChannel === channel.id ? 'bg-gray-700 text-white' : 'hover:bg-gray-700 hover:text-white'}`}
-                            onClick={() => handleChannelSelect(channel.id)}
-                        >
-                            # {channel.name}
+                    );
+                })}
+            </ul>
+            <h3 className="text-sm font-semibold text-gray-400 uppercase mb-4 mt-4">Private Channels</h3>
+            <ul>
+                {privateChannels.map(channel => {
+                    const unreadCount = unreadMessagesCount.get(channel.id) || 0;
+                    return (
+                        <li key={channel.id}
+                            className={`p-2 text-sm rounded hover:bg-gray-700 hover:text-white transition flex justify-between items-center ${channel.id === currentChannel ? 'bg-gray-700' : ''}`}>
+                            <span onClick={() => handleChannelSelect(channel.id)} className="cursor-pointer flex-grow">
+                                {channel.name}
+                            </span>
+                            {unreadCount > 0 && (
+                                <span className="ml-2 bg-red-500 text-white text-xs rounded-full px-2 py-1">
+                                    {unreadCount}
+                                </span>
+                            )}
                         </li>
-                    ))}
-                </ul>
-            </div>
-
-            {/* Create Channel Button and Dialog */}
+                    );
+                })}
+            </ul>
             <Button outline onClick={() => setIsOpen(true)}>
-                Create Channel <PlusIcon />
+                Create Channel <PlusIcon/>
             </Button>
             <Dialog open={isOpen} onClose={setIsOpen}>
                 <DialogTitle>Create Channel</DialogTitle>
                 <DialogDescription>
-                    Channel names can only contain alphanumeric characters a-z 0-9 and spaces.
+                    Enter the details for the new channel.
                 </DialogDescription>
                 <DialogBody>
                     <Field>
                         <Label>Channel Name</Label>
-                        <Input name="name" placeholder="channel name" value={name} onChange={(event) => setName(event.target.value)}/>
-                        <Label>Channel Description</Label>
-                        <Input name="description" placeholder="channel description" value={description} onChange={(event) => setDescription(event.target.value)}/>
-                        <CheckboxGroup>
-                            <CheckboxField>
-                                <Checkbox name="privacy" value={isPrivate} defaultChecked onChange={togglePrivate} />
-                                <Label>Private Channel?</Label>
-                            </CheckboxField>
-                        </CheckboxGroup>
+                        <Input name="name" placeholder="Channel Name" value={name}
+                               onChange={(event) => setName(event.target.value)}/>
+                    </Field>
+                    <Field>
+                        <Label>Description</Label>
+                        <Input name="description" placeholder="Description" value={description}
+                               onChange={(event) => setDescription(event.target.value)}/>
+                    </Field>
+                    <Field>
+                        <Label>Private</Label>
+                        <CheckboxField>
+                            <Checkbox checked={isPrivate === 'True'} onChange={togglePrivate}/>
+                            <span>Private Channel</span>
+                        </CheckboxField>
                     </Field>
                 </DialogBody>
                 <DialogActions>

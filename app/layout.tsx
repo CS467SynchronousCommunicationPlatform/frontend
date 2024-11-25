@@ -2,8 +2,6 @@ import '@/app/ui/globals.css';
 import { inter } from '@/app/ui/fonts';
 import { AppProvider } from './lib/contexts/AppContext';
 import NavBar from "@/app/ui/NavBar/NavBar";
-import { StackedLayout } from "@/app/ui/Catalyst/stacked-layout";
-import { Sidebar } from '@/app/ui/Catalyst/sidebar';
 import { createClient } from './lib/supabase/server';
 import {
     fetchAllChannelsForCurrentUser,
@@ -30,6 +28,7 @@ export default async function RootLayout({ children }: { children: ReactNode }) 
         currentChannel: 4,
         allMessages: new Map(previousMessages),
         channelUsers: new Map(channelUsers),
+        unreadMessagesCount: new Map(),
         isChannelBarVisible: false,
         isUserListVisible: false
     };

@@ -11,6 +11,7 @@ interface AppState {
     currentChannel: number;
     allMessages: Map<number, MessageProps[]>;
     channelUsers: Map<number, ChannelUser[]>;
+    unreadMessagesCount: Map<number, number>;
     isChannelBarVisible: boolean;
     isUserListVisible: boolean;
 }
@@ -22,6 +23,7 @@ const initialState: AppState = {
     currentChannel: 4,
     allMessages: new Map(),
     channelUsers: new Map(),
+    unreadMessagesCount: new Map(),
     isChannelBarVisible: false,
     isUserListVisible: false,
 };
@@ -57,6 +59,19 @@ const reducer = (state: AppState, action: any): AppState => {
             return { ...state, isChannelBarVisible: !state.isChannelBarVisible };
         case 'TOGGLE_USER_LIST':
             return { ...state, isUserListVisible: !state.isUserListVisible };
+        case 'INCREMENT_UNREAD_COUNT': {
+            const { channelId } = action.payload;
+            const unreadCount = state.unreadMessagesCount.get(channelId) || 0;
+            const newUnreadMessagesCount = new Map(state.unreadMessagesCount);
+            newUnreadMessagesCount.set(channelId, unreadCount + 1);
+            return { ...state, unreadMessagesCount: newUnreadMessagesCount };
+        }
+        case 'RESET_UNREAD_COUNT': {
+            const { channelId } = action.payload;
+            const newUnreadMessagesCount = new Map(state.unreadMessagesCount);
+            newUnreadMessagesCount.set(channelId, 0);
+            return { ...state, unreadMessagesCount: newUnreadMessagesCount };
+        }
         case 'HIDE_BARS':
             return { ...state, isChannelBarVisible: false, isUserListVisible: false };
         default:
