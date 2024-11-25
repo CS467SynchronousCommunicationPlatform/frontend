@@ -30,7 +30,6 @@ export default function Master() {
     const {state, dispatch} = useAppState();
     const { user, currentChannel, allMessages, isChannelBarVisible, isUserListVisible } = state;
 
-    const [msgBody, setMsgBody] = useState<string>('')
     const [isConnected, setIsConnected] = useState(socket.connected)
 
     const channelBarRef = useRef<HTMLDivElement>(null);
@@ -80,6 +79,13 @@ export default function Master() {
                     message
                 ]))
             });
+
+            if (message.channel_id !== currentChannel) {
+                dispatch({
+                    type: 'INCREMENT_UNREAD_COUNT',
+                    payload: {channel_id: message.channel_id}
+                })
+            }
         };
 
         socket.on('connect', onConnect)
