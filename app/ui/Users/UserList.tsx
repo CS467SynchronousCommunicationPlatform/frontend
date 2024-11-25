@@ -63,6 +63,7 @@ const UserList: React.FC = () => {
 
             alert('User added to the channel successfully');
         } catch (error) {
+            // @ts-ignore
             alert(error.message);
         } finally {
             setIsLoading(false);
