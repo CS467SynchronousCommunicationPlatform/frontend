@@ -48,6 +48,11 @@ const reducer = (state: AppState, action: any): AppState => {
             return { ...state, allMessages: new Map(action.payload) };
         case 'SET_CHANNEL_USERS':
             return { ...state, channelUsers: new Map(action.payload) };
+        case 'ADD_USER_TO_CHANNEL':
+            const updatedChannelUsers = new Map(state.channelUsers);
+            const users = updatedChannelUsers.get(action.payload.channelId) || [];
+            updatedChannelUsers.set(action.payload.channelId, [...users, action.payload.user]);
+            return { ...state, channelUsers: updatedChannelUsers };
         case 'TOGGLE_CHANNEL_BAR':
             return { ...state, isChannelBarVisible: !state.isChannelBarVisible };
         case 'TOGGLE_USER_LIST':

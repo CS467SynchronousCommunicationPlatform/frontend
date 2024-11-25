@@ -106,26 +106,6 @@ export async function updateUserDisplayName(userId: string, displayName: string)
 }
 
 /**
- * Fetch all users
- * This function hits the /users endpoint and returns all users as a JSON object.
- * @returns an array of users
- */
-export async function fetchAllUsers() {
-    try {
-        const response = await fetch(`${api}/users`, apiHeaders);
-        if (response.ok) {
-            const users: User[] = await response.json();
-            return users;
-        } else {
-            console.error('Failed to fetch users:', response.statusText);
-        }
-    } catch (error) {
-        console.error('Error fetching users:', error);
-    }
-    return [];
-}
-
-/**
  * Create a new channel
  * This function hits the /channels endpoint and creates a new channel with the given name, description, and privacy.
  * @param name The name of the channel
@@ -193,6 +173,25 @@ export async function addUserToChannel(channelId: string, userId: string) {
         }
     } catch (error) {
         console.error('Error adding user to channel:', error);
+        throw error;
+    }
+}
+
+/**
+ * Fetch all users
+ * This function hits the /users endpoint and returns all users as a JSON object.
+ * @returns an array of users
+ */
+export async function fetchAllUsers() {
+    try {
+        const response = await fetch(`${api}/users`, apiHeaders);
+        if (response.ok) {
+            return await response.json();
+        } else {
+            throw new Error('Failed to fetch users');
+        }
+    } catch (error) {
+        console.error('Error fetching users:', error);
         throw error;
     }
 }
