@@ -2,6 +2,7 @@
 
 
 import { signout } from '@/app/login/actions';
+import { socket } from '@/socket';
 import { Button } from "@/app/ui/Catalyst/button";
 import { PlusIcon} from "@heroicons/react/16/solid";
 import { Dialog, DialogActions, DialogBody, DialogDescription, DialogTitle } from '@/app/ui/Catalyst/dialog'
@@ -24,6 +25,7 @@ import { useAppState } from '@/app/lib/contexts/AppContext';
 export default function ChannelBar() {
     const { state, dispatch } = useAppState();
     const { channels, currentChannel, user, unreadMessagesCount } = state;
+    const [isConnected, setIsConnected] = useState(socket.connected);
 
     let [isOpen, setIsOpen] = useState(false)
     const [name, setName] = useState('')
@@ -68,6 +70,24 @@ export default function ChannelBar() {
             alert("Failed to create channel. Please try again.");
         }
     };
+
+    useEffect(() => {
+        const onConnect = () => setIsConnected(true);
+        const onDisconnect = () => setIsConnected(false);
+
+        socket.on('connect', onConnect);
+        socket.on('disconnect', onDisconnect);
+        socket.on('channel', (msg) => {
+            if (msg.message == "Added to channel") {
+                setShouldFetchData(true);
+            }
+        })
+
+        return () => {
+            socket.off('connect', onConnect);
+            socket.off('disconnect', onDisconnect);
+        };
+    }, []);
 
     useEffect(() => {
         if (shouldFetchData) {
