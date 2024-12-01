@@ -47,6 +47,7 @@ export default function Master() {
         return () => {
             // When the user logs out or closes the page, disconnect the socket
             socket.disconnect()
+            console.log('[SOCKET] Client disconnected')
         }// @ts-ignore
     }, [user.id])
 

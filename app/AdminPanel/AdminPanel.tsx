@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from 'react';
+import { socket, updateSocketAuth } from '@/socket';
 import { updateUserDisplayName, fetchAllUsers } from '@/app/lib/api/api';
 import { Heading } from "@/app/ui/Catalyst/heading";
 import { Divider } from "@/app/ui/Catalyst/divider";
@@ -14,14 +15,23 @@ const AdminPanelComponent: React.FC = () => {
     const [userName, setUserName] = useState('');
 
     useEffect(() => {
+        updateSocketAuth(state.user!.id)
+        socket.connect()
+        console.log('[SOCKET] Client connected')
+
         fetchAllUsers().then(users => {
             for (const u of users) {
                 if (u.id == state.user?.id) {
-                    console.log(u)
                     setUserName(u.display_name);
                 }
             }
         });
+
+        return () => {
+            // When the user logs out or closes the page, disconnect the socket
+            socket.disconnect()
+            console.log('[SOCKET] Client disconnected')
+        }
     }, []);
 
     const handleSubmit = async (event: React.FormEvent) => {
