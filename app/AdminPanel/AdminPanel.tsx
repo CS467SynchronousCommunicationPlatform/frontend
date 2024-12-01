@@ -13,9 +13,10 @@ const AdminPanelComponent: React.FC = () => {
     const [displayName, setDisplayName] = useState('');
     const [errorMessage, setErrorMessage] = useState('');
     const [userName, setUserName] = useState('');
+    const { user, allMessages } = state;
 
     useEffect(() => {
-        updateSocketAuth(state.user!.id)
+        updateSocketAuth(user!.id)
         socket.connect()
         socket.on("connected", (msg) => {
             // get statuses on connection
@@ -25,6 +26,15 @@ const AdminPanelComponent: React.FC = () => {
             }
             dispatch({ type: 'SET_USER_STATUSES', payload: statuses });
         });
+        socket.on('chat', (msg) => {
+            dispatch({
+                type: 'SET_MESSAGES',
+                payload: new Map(allMessages.set(msg.channel_id, [
+                    ...(allMessages.get(msg.channel_id) || []),
+                    msg
+                ]))
+            });
+        })
         console.log('[SOCKET] Client connected')
 
         fetchAllUsers().then(users => {
@@ -38,6 +48,7 @@ const AdminPanelComponent: React.FC = () => {
         return () => {
             // When the user logs out or closes the page, disconnect the socket
             socket.disconnect()
+            socket.off('chat')
             console.log('[SOCKET] Client disconnected')
         }
     }, []);
