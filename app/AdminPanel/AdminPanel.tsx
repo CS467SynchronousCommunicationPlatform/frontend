@@ -9,7 +9,7 @@ import { Text } from "@/app/ui/Catalyst/text";
 import { useAppState } from '@/app/lib/contexts/AppContext';
 
 const AdminPanelComponent: React.FC = () => {
-    const { state } = useAppState();
+    const { state, dispatch } = useAppState();
     const [displayName, setDisplayName] = useState('');
     const [errorMessage, setErrorMessage] = useState('');
     const [userName, setUserName] = useState('');
@@ -17,6 +17,14 @@ const AdminPanelComponent: React.FC = () => {
     useEffect(() => {
         updateSocketAuth(state.user!.id)
         socket.connect()
+        socket.on("connected", (msg) => {
+            // get statuses on connection
+            let statuses = new Map();
+            for (const {user, status} of msg.userStatus) {
+                statuses.set(user, status);
+            }
+            dispatch({ type: 'SET_USER_STATUSES', payload: statuses });
+        });
         console.log('[SOCKET] Client connected')
 
         fetchAllUsers().then(users => {

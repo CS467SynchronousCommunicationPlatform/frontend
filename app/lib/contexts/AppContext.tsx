@@ -12,6 +12,7 @@ interface AppState {
     allMessages: Map<number, MessageProps[]>;
     channelUsers: Map<number, ChannelUser[]>;
     unreadMessagesCount: Map<number, number>;
+    userStatuses: Map<string, string>;
     isChannelBarVisible: boolean;
     isUserListVisible: boolean;
 }
@@ -24,6 +25,7 @@ const initialState: AppState = {
     allMessages: new Map(),
     channelUsers: new Map(),
     unreadMessagesCount: new Map(),
+    userStatuses: new Map(),
     isChannelBarVisible: false,
     isUserListVisible: false,
 };
@@ -50,6 +52,8 @@ const reducer = (state: AppState, action: any): AppState => {
             return { ...state, allMessages: new Map(action.payload) };
         case 'SET_CHANNEL_USERS':
             return { ...state, channelUsers: new Map(action.payload) };
+        case 'SET_USER_STATUSES':
+            return { ...state, userStatuses: new Map(action.payload) };
         case 'ADD_USER_TO_CHANNEL':
             const updatedChannelUsers = new Map(state.channelUsers);
             const users = updatedChannelUsers.get(action.payload.channelId) || [];

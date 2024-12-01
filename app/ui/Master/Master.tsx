@@ -42,6 +42,14 @@ export default function Master() {
         // @ts-ignore
         updateSocketAuth(user.id)
         socket.connect()
+        socket.on("connected", (msg) => {
+            // get statuses on connection
+            let statuses = new Map();
+            for (const {user, status} of msg.userStatus) {
+                statuses.set(user, status);
+            }
+            dispatch({ type: 'SET_USER_STATUSES', payload: statuses });
+        });
         console.log('[SOCKET] Client connected')
 
         return () => {

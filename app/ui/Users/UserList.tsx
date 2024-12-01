@@ -11,7 +11,7 @@ import {addUserToChannel, fetchAllUsers} from "@/app/lib/api/api";
 
 const UserList: React.FC = () => {
     const { state, dispatch } = useAppState();
-    const { currentChannel, channelUsers } = state;
+    const { currentChannel, channelUsers, userStatuses } = state;
     let [isOpen, setIsOpen] = useState(false)
     const [display_name, setName] = useState('')
     const [isLoading, setIsLoading] = useState(false);
@@ -41,7 +41,17 @@ const UserList: React.FC = () => {
                 newChannelsAndUsers.set(channelId, userCopy);
             }
             dispatch({ type: 'SET_CHANNEL_USERS', payload: newChannelsAndUsers });
-        })
+
+            // update status map with new name
+            userStatuses.set(msg.new, userStatuses.get(msg.previous)!);
+            userStatuses.delete(msg.previous);
+            dispatch({ type: 'SET_USER_STATUSES', payload: userStatuses });
+        });
+
+        socket.on("status", (msg) => {
+            userStatuses.set(msg.user, msg.status);
+            dispatch({ type: 'SET_USER_STATUSES', payload: userStatuses });
+        });
 
         return () => {
             socket.off('connect', onConnect);
@@ -112,8 +122,20 @@ const UserList: React.FC = () => {
     return (
         <div className="h-full overflow-y-auto bg-gray-900 text-gray-300 p-3 mt-16 sm:mt-0">
             <h3 className="text-sm font-semibold text-gray-400 uppercase mb-4">User List</h3>
+            <h5>Online:</h5>
             <ul>
-                {users.map((user) => (
+                {users.filter(user => userStatuses?.get(user.display_name) === "Online").map((user) => (
+                    <li
+                        key={user.id}
+                        className="p-2 text-sm rounded hover:bg-gray-700 hover:text-white transition"
+                    >
+                        {user.display_name}
+                    </li>
+                ))}
+            </ul>
+            <h5>Offline</h5>
+            <ul>
+                {users.filter(user => userStatuses?.get(user.display_name) !== "Online").map((user) => (
                     <li
                         key={user.id}
                         className="p-2 text-sm rounded hover:bg-gray-700 hover:text-white transition"

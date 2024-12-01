@@ -41,7 +41,6 @@ export interface ChannelUser {
     id: number;
     created_at: string;
     display_name: string;
-    status: 'online' | 'away' | 'offline';
 }
 
 /**
