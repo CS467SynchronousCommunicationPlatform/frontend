@@ -2,6 +2,7 @@
 
 
 import { signout } from '@/app/login/actions';
+import { socket } from '@/socket';
 import { Button } from "@/app/ui/Catalyst/button";
 import { PlusIcon} from "@heroicons/react/16/solid";
 import { Dialog, DialogActions, DialogBody, DialogDescription, DialogTitle } from '@/app/ui/Catalyst/dialog'
@@ -13,7 +14,9 @@ import {
     fetchAllChannelsForCurrentUser,
     fetchAllPreviousMessages,
     fetchChannelUsers,
-    createNewChannel
+    createNewChannel,
+    resetUnread,
+    fetchNotificationCount
 } from "@/app/lib/api/api";
 import { useAppState } from '@/app/lib/contexts/AppContext';
 
@@ -24,6 +27,7 @@ import { useAppState } from '@/app/lib/contexts/AppContext';
 export default function ChannelBar() {
     const { state, dispatch } = useAppState();
     const { channels, currentChannel, user, unreadMessagesCount } = state;
+    const [isConnected, setIsConnected] = useState(socket.connected);
 
     let [isOpen, setIsOpen] = useState(false)
     const [name, setName] = useState('')
@@ -70,18 +74,40 @@ export default function ChannelBar() {
     };
 
     useEffect(() => {
+        const onConnect = () => setIsConnected(true);
+        const onDisconnect = () => setIsConnected(false);
+
+        socket.on('connect', onConnect);
+        socket.on('disconnect', onDisconnect);
+        socket.on('channel', async (msg) => {
+            const channels = await fetchAllChannelsForCurrentUser(user!);
+            dispatch({ type: 'SET_CHANNELS', payload: channels });
+            setShouldFetchData(true);
+        })
+
+        setShouldFetchData(true);
+
+        return () => {
+            socket.off('connect', onConnect);
+            socket.off('disconnect', onDisconnect);
+        };
+    }, []);
+
+    useEffect(() => {
         if (shouldFetchData) {
             const fetchData = async () => {
                 try {
-                    const [updatedChannels, newMessages, newUserList] = await Promise.all([
+                    const [updatedChannels, newMessages, newUserList, newUnreadCounts] = await Promise.all([
                         // @ts-ignore
                         fetchAllChannelsForCurrentUser(user),
                         fetchAllPreviousMessages(channels),
                         fetchChannelUsers(channels),
+                        fetchNotificationCount(user!.id, channels)
                     ]);
                     dispatch({ type: 'SET_CHANNELS', payload: updatedChannels });
                     dispatch({ type: 'SET_MESSAGES', payload: newMessages });
                     dispatch({ type: 'SET_CHANNEL_USERS', payload: newUserList });
+                    dispatch({ type: 'SET_UNREAD_COUNT', payload: newUnreadCounts });
                 } catch (error) {
                     console.error("Failed to fetch updated data:", error);
                 }
@@ -91,9 +117,10 @@ export default function ChannelBar() {
         }
     }, [shouldFetchData, user, channels, dispatch]);
 
-    const handleChannelSelect = (channelId: number) => {
+    const handleChannelSelect = async (channelId: number) => {
         dispatch({ type: 'SET_CURRENT_CHANNEL', payload: channelId });
         dispatch({ type: 'RESET_UNREAD_COUNT', payload: channelId });
+        await resetUnread(user!.id, channelId);
     };
 
     // Group channels by public and private

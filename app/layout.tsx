@@ -29,6 +29,7 @@ export default async function RootLayout({ children }: { children: ReactNode }) 
         allMessages: new Map(previousMessages),
         channelUsers: new Map(channelUsers),
         unreadMessagesCount: new Map(),
+        userStatuses: new Map(),
         isChannelBarVisible: false,
         isUserListVisible: false
     };

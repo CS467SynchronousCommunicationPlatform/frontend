@@ -7,7 +7,13 @@ import { MessageProps } from '@/app/lib/types/types'
 const Message: React.FC<MessageProps> = ({ user, body, timestamp }) => {
 
   const date = new Date(timestamp)
-    const formattedDate = date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+  const formattedDate = date.toLocaleTimeString([], {
+    month: '2-digit',
+    day: '2-digit',
+    year: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit'
+  });
   return (
       <div className="mb-2">
           <span className="text-sm font-bold text-gray-400">{user}</span>{' '}

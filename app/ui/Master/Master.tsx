@@ -16,6 +16,7 @@ import PreviousMessages from '@/app/ui/Chat/PreviousMessages'
 import UserList from '@/app/ui/Users/UserList'
 import ChannelBar from '@/app/ui/Channels/ChannelBar';
 import { useAppState } from '@/app/lib/contexts/AppContext';
+import { resetUnread } from '@/app/lib/api/api';
 
 
 
@@ -42,11 +43,20 @@ export default function Master() {
         // @ts-ignore
         updateSocketAuth(user.id)
         socket.connect()
+        socket.on("connected", (msg) => {
+            // get statuses on connection
+            let statuses = new Map();
+            for (const {user, status} of msg.userStatus) {
+                statuses.set(user, status);
+            }
+            dispatch({ type: 'SET_USER_STATUSES', payload: statuses });
+        });
         console.log('[SOCKET] Client connected')
 
         return () => {
             // When the user logs out or closes the page, disconnect the socket
             socket.disconnect()
+            console.log('[SOCKET] Client disconnected')
         }// @ts-ignore
     }, [user.id])
 
@@ -83,8 +93,11 @@ export default function Master() {
             if (message.channel_id !== currentChannel) {
                 dispatch({
                     type: 'INCREMENT_UNREAD_COUNT',
-                    payload: {channel_id: message.channel_id}
+                    payload: message.channel_id
                 })
+            } else {
+                // a little hacky, but this resolves a race condition with backend
+                setTimeout(() => resetUnread(user!.id, message.channel_id), 100);
             }
         };
 
@@ -98,7 +111,7 @@ export default function Master() {
             socket.off('connect_error', onError)
             socket.off('chat', onIncomingMessage)
         }// @ts-ignore
-    }, [user.id, dispatch, allMessages])
+    }, [user.id, dispatch, allMessages, currentChannel])
 
     const handleClickOutside = (event: MouseEvent) => {
         if (
