@@ -62,6 +62,7 @@ const AdminPanelComponent: React.FC = () => {
                     Display Name:
                     <input
                         type="text"
+                        style={{ color: "black" }}
                         value={displayName}
                         onChange={(e) => setDisplayName(e.target.value)}
                         required

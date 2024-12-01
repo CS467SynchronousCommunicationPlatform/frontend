@@ -109,6 +109,7 @@ const UserList: React.FC = () => {
                                 {userSuggestions.map((user) => (
                                     <li
                                         key={user.id}
+                                        style={{ color: "black" }}
                                         className="p-2 hover:bg-gray-200 cursor-pointer"
                                         onClick={() => handleUserSelect(user)}
                                     >
