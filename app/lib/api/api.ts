@@ -194,3 +194,64 @@ export async function fetchAllUsers() {
         throw error;
     }
 }
+
+/**
+ * Clear notifications
+ * This function hits the /notifications endpoint and clears notifications for a user and channel
+ */
+export async function resetUnread(userId: string, channelId: number) {
+    try {
+        const requestBody = {
+            function: "clearnotifications",
+            userId: userId,
+            channelId: channelId
+        }
+        const response = await fetch(`${api}/notifications`, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(requestBody),
+        });
+
+        if (response.ok) {
+            return await response.json();
+        } else {
+            throw new Error('Failed to reset notifications');
+        }
+    } catch (error) {
+        console.error('Error resetting unread:', error);
+        throw error;
+    }
+}
+
+/**
+ * Get notifications
+ * This function hits the /notifications endpoint and gets notifications for a user and channel
+ */
+export async function fetchNotificationCount(userId: string, channels: Channel[]) {
+    const channelUnreads = new Map<number, number>
+    for (const channel of channels) {
+        try {
+            const requestBody = {
+                userId: userId,
+                channelId: channel.id
+            }
+            const response = await fetch(`${api}/notifications`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(requestBody),
+            });
+            if (response.ok) {
+                const notifications = (await response.json())[0];
+                console.log(notifications)
+                channelUnreads.set(channel.id, notifications.unread)
+            }
+        } catch (error) {
+            console.error('Error with getting notification count', error);
+        }
+    }
+    return channelUnreads
+}

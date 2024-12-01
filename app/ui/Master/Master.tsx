@@ -16,6 +16,7 @@ import PreviousMessages from '@/app/ui/Chat/PreviousMessages'
 import UserList from '@/app/ui/Users/UserList'
 import ChannelBar from '@/app/ui/Channels/ChannelBar';
 import { useAppState } from '@/app/lib/contexts/AppContext';
+import { resetUnread } from '@/app/lib/api/api';
 
 
 
@@ -94,6 +95,9 @@ export default function Master() {
                     type: 'INCREMENT_UNREAD_COUNT',
                     payload: message.channel_id
                 })
+            } else {
+                // a little hacky, but this resolves a race condition with backend
+                setTimeout(() => resetUnread(user!.id, message.channel_id), 100);
             }
         };
 

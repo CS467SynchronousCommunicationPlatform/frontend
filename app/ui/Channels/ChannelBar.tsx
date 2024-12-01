@@ -14,7 +14,9 @@ import {
     fetchAllChannelsForCurrentUser,
     fetchAllPreviousMessages,
     fetchChannelUsers,
-    createNewChannel
+    createNewChannel,
+    resetUnread,
+    fetchNotificationCount
 } from "@/app/lib/api/api";
 import { useAppState } from '@/app/lib/contexts/AppContext';
 
@@ -83,6 +85,8 @@ export default function ChannelBar() {
             setShouldFetchData(true);
         })
 
+        setShouldFetchData(true);
+
         return () => {
             socket.off('connect', onConnect);
             socket.off('disconnect', onDisconnect);
@@ -93,15 +97,17 @@ export default function ChannelBar() {
         if (shouldFetchData) {
             const fetchData = async () => {
                 try {
-                    const [updatedChannels, newMessages, newUserList] = await Promise.all([
+                    const [updatedChannels, newMessages, newUserList, newUnreadCounts] = await Promise.all([
                         // @ts-ignore
                         fetchAllChannelsForCurrentUser(user),
                         fetchAllPreviousMessages(channels),
                         fetchChannelUsers(channels),
+                        fetchNotificationCount(user!.id, channels)
                     ]);
                     dispatch({ type: 'SET_CHANNELS', payload: updatedChannels });
                     dispatch({ type: 'SET_MESSAGES', payload: newMessages });
                     dispatch({ type: 'SET_CHANNEL_USERS', payload: newUserList });
+                    dispatch({ type: 'SET_UNREAD_COUNT', payload: newUnreadCounts });
                 } catch (error) {
                     console.error("Failed to fetch updated data:", error);
                 }
@@ -111,9 +117,10 @@ export default function ChannelBar() {
         }
     }, [shouldFetchData, user, channels, dispatch]);
 
-    const handleChannelSelect = (channelId: number) => {
+    const handleChannelSelect = async (channelId: number) => {
         dispatch({ type: 'SET_CURRENT_CHANNEL', payload: channelId });
         dispatch({ type: 'RESET_UNREAD_COUNT', payload: channelId });
+        await resetUnread(user!.id, channelId);
     };
 
     // Group channels by public and private
