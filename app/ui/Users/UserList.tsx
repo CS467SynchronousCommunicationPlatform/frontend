@@ -1,5 +1,6 @@
 import React, {useState, useEffect} from 'react';
 import { useAppState } from '@/app/lib/contexts/AppContext';
+import { socket } from '@/socket';
 import { ChannelUser } from '@/app/lib/types/types';
 import {Button} from "@/app/ui/Catalyst/button";
 import {PlusIcon} from "@heroicons/react/16/solid";
@@ -16,8 +17,37 @@ const UserList: React.FC = () => {
     const [isLoading, setIsLoading] = useState(false);
     const [userSuggestions, setUserSuggestions] = useState<ChannelUser[]>([]);
     const [selectedUser, setSelectedUser] = useState<ChannelUser | null>(null);
+    const [isConnected, setIsConnected] = useState(socket.connected);
 
     const users: ChannelUser[] = channelUsers.get(currentChannel) || [];
+
+    useEffect(() => {
+        const onConnect = () => setIsConnected(true);
+        const onDisconnect = () => setIsConnected(false);
+
+        socket.on('connect', onConnect);
+        socket.on('disconnect', onDisconnect);
+
+        socket.on('displayname', async (msg) => {
+            // create updated user listing and set it
+            const newChannelsAndUsers = new Map<number, ChannelUser[]>;
+            for (const [channelId, users] of channelUsers.entries()) {
+                let userCopy = [...users]
+                for (let user of userCopy) {
+                    if (user.display_name == msg.previous) {
+                        user.display_name = msg.new;
+                    }
+                }
+                newChannelsAndUsers.set(channelId, userCopy);
+            }
+            dispatch({ type: 'SET_CHANNEL_USERS', payload: newChannelsAndUsers });
+        })
+
+        return () => {
+            socket.off('connect', onConnect);
+            socket.off('disconnect', onDisconnect);
+        };
+    }, []);
 
     // Fetch user suggestions based on the display name
     useEffect(() => {
