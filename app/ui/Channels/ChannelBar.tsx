@@ -77,10 +77,10 @@ export default function ChannelBar() {
 
         socket.on('connect', onConnect);
         socket.on('disconnect', onDisconnect);
-        socket.on('channel', (msg) => {
-            if (msg.message == "Added to channel") {
-                setShouldFetchData(true);
-            }
+        socket.on('channel', async (msg) => {
+            const channels = await fetchAllChannelsForCurrentUser(user!);
+            dispatch({ type: 'SET_CHANNELS', payload: channels });
+            setShouldFetchData(true);
         })
 
         return () => {
