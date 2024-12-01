@@ -42,39 +42,49 @@ const AppContext = createContext<{
 // Define a reducer
 const reducer = (state: AppState, action: any): AppState => {
     switch (action.type) {
-        case 'SET_USER':
+        case 'SET_USER': {
             return { ...state, user: action.payload };
-        case 'SET_CHANNELS':
+        }
+        case 'SET_CHANNELS': {
             return { ...state, channels: action.payload };
-        case 'SET_CURRENT_CHANNEL':
+        }
+        case 'SET_CURRENT_CHANNEL': {
             return { ...state, currentChannel: action.payload };
-        case 'SET_MESSAGES':
+        }
+        case 'SET_MESSAGES': {
             return { ...state, allMessages: new Map(action.payload) };
-        case 'SET_CHANNEL_USERS':
+        }
+        case 'SET_CHANNEL_USERS': {
             return { ...state, channelUsers: new Map(action.payload) };
-        case 'SET_USER_STATUSES':
+        }
+        case 'SET_USER_STATUSES': {
             return { ...state, userStatuses: new Map(action.payload) };
-        case 'ADD_USER_TO_CHANNEL':
+        }
+        case 'ADD_USER_TO_CHANNEL': {
             const updatedChannelUsers = new Map(state.channelUsers);
             const users = updatedChannelUsers.get(action.payload.channelId) || [];
             updatedChannelUsers.set(action.payload.channelId, [...users, action.payload.user]);
             return { ...state, channelUsers: updatedChannelUsers };
+        }
         case 'TOGGLE_CHANNEL_BAR':
             return { ...state, isChannelBarVisible: !state.isChannelBarVisible };
         case 'TOGGLE_USER_LIST':
             return { ...state, isUserListVisible: !state.isUserListVisible };
         case 'INCREMENT_UNREAD_COUNT': {
-            const { channelId } = action.payload;
+            const channelId = action.payload;
             const unreadCount = state.unreadMessagesCount.get(channelId) || 0;
             const newUnreadMessagesCount = new Map(state.unreadMessagesCount);
             newUnreadMessagesCount.set(channelId, unreadCount + 1);
             return { ...state, unreadMessagesCount: newUnreadMessagesCount };
         }
         case 'RESET_UNREAD_COUNT': {
-            const { channelId } = action.payload;
+            const channelId = action.payload;
             const newUnreadMessagesCount = new Map(state.unreadMessagesCount);
             newUnreadMessagesCount.set(channelId, 0);
             return { ...state, unreadMessagesCount: newUnreadMessagesCount };
+        }
+        case 'SET_UNREAD_COUNT': {
+            return { ...state, unreadMessagesCount: new Map(action.payload) };
         }
         case 'HIDE_BARS':
             return { ...state, isChannelBarVisible: false, isUserListVisible: false };
@@ -84,10 +94,7 @@ const reducer = (state: AppState, action: any): AppState => {
 };
 
 // Create a provider component
-export const AppProvider: React.FC<{ children: ReactNode; initialState: AppState }> = ({
-                                                                                           children,
-                                                                                           initialState,
-                                                                                       }) => {
+export const AppProvider: React.FC<{ children: ReactNode; initialState: AppState }> = ({children, initialState}) => {
     const [state, dispatch] = useReducer(reducer, initialState);
 
     return (

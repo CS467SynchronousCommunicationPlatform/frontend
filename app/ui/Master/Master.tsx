@@ -92,7 +92,7 @@ export default function Master() {
             if (message.channel_id !== currentChannel) {
                 dispatch({
                     type: 'INCREMENT_UNREAD_COUNT',
-                    payload: {channel_id: message.channel_id}
+                    payload: message.channel_id
                 })
             }
         };
@@ -107,7 +107,7 @@ export default function Master() {
             socket.off('connect_error', onError)
             socket.off('chat', onIncomingMessage)
         }// @ts-ignore
-    }, [user.id, dispatch, allMessages])
+    }, [user.id, dispatch, allMessages, currentChannel])
 
     const handleClickOutside = (event: MouseEvent) => {
         if (
