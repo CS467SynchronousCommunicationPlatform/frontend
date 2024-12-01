@@ -130,9 +130,9 @@ export async function createNewChannel(name: string, description: string, isPriv
         });
 
         if (response.ok) {
-            const channel = await response.json();
-            console.log(channel[0].id)
-            await addUserToChannel(channel[0].id.toString(), userid)
+            const channel = (await response.json())[0];
+            console.log(channel.id)
+            await addUserToChannel(channel.id.toString(), userid)
             return channel;
         } else {
             const errorData = await response.json();
