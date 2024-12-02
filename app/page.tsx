@@ -5,7 +5,7 @@ import Master from "@/app/ui/Master/Master";
 
 
 /**
- * The entry point to our Admin Panel.
+ * Thee entry point to our Admin Panel.
  * Handles authentication and data fetching.
  * @returns AdminPanel component
  */
